@@ -1,25 +1,36 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
-import { animate, stagger } from 'animejs';
-import type { TechCategory, Skill, SkillCategory } from '@/types';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import type { SkillCategory } from '@/types';
 
-// ============================================
-// DATA
-// ============================================
+interface TechItem {
+  name: string;
+  since?: string;
+  projects?: number;
+}
 
-const TECH_CATEGORIES: TechCategory[] = [
+interface CategoryData {
+  name: string;
+  key: SkillCategory;
+  description: string;
+  color: string;
+  techs: TechItem[];
+}
+
+const CATEGORIES: CategoryData[] = [
   {
     name: 'Frontend',
     key: 'frontend',
     description: 'Crafting pixel-perfect interfaces',
     color: '#61DAFB',
-    technologies: [
-      { name: 'React', category: 'frontend', level: 92 },
-      { name: 'Next.js', category: 'frontend', level: 90 },
-      { name: 'TypeScript', category: 'frontend', level: 88 },
-      { name: 'Tailwind CSS', category: 'frontend', level: 95 },
-      { name: 'HTML/CSS', category: 'frontend', level: 96 },
+    techs: [
+      { name: 'React', since: '2022', projects: 12 },
+      { name: 'Next.js', since: '2023', projects: 8 },
+      { name: 'TypeScript', since: '2022', projects: 15 },
+      { name: 'Tailwind CSS', since: '2023', projects: 10 },
+      { name: 'Framer Motion', since: '2023', projects: 6 },
+      { name: 'Vite', since: '2024', projects: 5 },
     ],
   },
   {
@@ -27,12 +38,27 @@ const TECH_CATEGORIES: TechCategory[] = [
     key: 'backend',
     description: 'Building scalable architectures',
     color: '#68A063',
-    technologies: [
-      { name: 'Node.js', category: 'backend', level: 88 },
-      { name: 'Python', category: 'backend', level: 85 },
-      { name: 'Express', category: 'backend', level: 86 },
-      { name: 'FastAPI', category: 'backend', level: 80 },
-      { name: 'REST APIs', category: 'backend', level: 92 },
+    techs: [
+      { name: 'Node.js', since: '2022', projects: 10 },
+      { name: 'Python', since: '2023', projects: 8 },
+      { name: 'Express', since: '2022', projects: 7 },
+      { name: 'FastAPI', since: '2024', projects: 4 },
+      { name: 'REST APIs', since: '2022', projects: 15 },
+      { name: 'Firebase', since: '2023', projects: 5 },
+    ],
+  },
+  {
+    name: 'AI & ML',
+    key: 'ai',
+    description: 'Intelligent systems & models',
+    color: '#FF6B6B',
+    techs: [
+      { name: 'LangChain', since: '2024', projects: 5 },
+      { name: 'OpenAI', since: '2023', projects: 7 },
+      { name: 'Groq', since: '2024', projects: 3 },
+      { name: 'Hugging Face', since: '2024', projects: 4 },
+      { name: 'RAG', since: '2024', projects: 5 },
+      { name: 'Vector DBs', since: '2024', projects: 4 },
     ],
   },
   {
@@ -40,24 +66,12 @@ const TECH_CATEGORIES: TechCategory[] = [
     key: 'databases',
     description: 'Designing data solutions',
     color: '#336791',
-    technologies: [
-      { name: 'PostgreSQL', category: 'databases', level: 85 },
-      { name: 'MongoDB', category: 'databases', level: 82 },
-      { name: 'Redis', category: 'databases', level: 75 },
-      { name: 'Supabase', category: 'databases', level: 80 },
-    ],
-  },
-  {
-    name: 'AI',
-    key: 'ai',
-    description: 'Intelligent systems & models',
-    color: '#FF6B6B',
-    technologies: [
-      { name: 'LangChain', category: 'ai', level: 82 },
-      { name: 'OpenAI', category: 'ai', level: 88 },
-      { name: 'Hugging Face', category: 'ai', level: 75 },
-      { name: 'RAG', category: 'ai', level: 80 },
-      { name: 'Vector DBs', category: 'ai', level: 78 },
+    techs: [
+      { name: 'PostgreSQL', since: '2022', projects: 8 },
+      { name: 'MongoDB', since: '2023', projects: 6 },
+      { name: 'Redis', since: '2023', projects: 4 },
+      { name: 'Supabase', since: '2024', projects: 3 },
+      { name: 'Firestore', since: '2023', projects: 5 },
     ],
   },
   {
@@ -65,45 +79,41 @@ const TECH_CATEGORIES: TechCategory[] = [
     key: 'automation',
     description: 'Streamlining complex workflows',
     color: '#FFB347',
-    technologies: [
-      { name: 'n8n', category: 'automation', level: 85 },
-      { name: 'Custom Agents', category: 'automation', level: 82 },
-      { name: 'Workflow Engines', category: 'automation', level: 80 },
-      { name: 'Cron Systems', category: 'automation', level: 78 },
+    techs: [
+      { name: 'n8n', since: '2024', projects: 4 },
+      { name: 'Custom Agents', since: '2024', projects: 5 },
+      { name: 'CI/CD Pipelines', since: '2023', projects: 8 },
+      { name: 'Workflow Engines', since: '2024', projects: 3 },
+      { name: 'GitHub Actions', since: '2023', projects: 7 },
     ],
   },
   {
-    name: 'DevOps',
+    name: 'DevOps & Cloud',
     key: 'devops',
     description: 'Shipping with confidence',
     color: '#4F8CFF',
-    technologies: [
-      { name: 'Docker', category: 'devops', level: 82 },
-      { name: 'Git', category: 'devops', level: 92 },
-      { name: 'GitHub Actions', category: 'devops', level: 80 },
-      { name: 'Vercel', category: 'devops', level: 90 },
-      { name: 'AWS', category: 'devops', level: 72 },
+    techs: [
+      { name: 'Docker', since: '2023', projects: 6 },
+      { name: 'AWS', since: '2023', projects: 5 },
+      { name: 'Vercel', since: '2023', projects: 10 },
+      { name: 'Git', since: '2021', projects: 20 },
+      { name: 'Firebase', since: '2023', projects: 5 },
     ],
   },
 ];
 
-// ============================================
-// CATEGORY ICON
-// ============================================
-
 function CategoryIcon({ category, color }: { category: SkillCategory; color: string }) {
-  const iconStyle = { stroke: color, strokeWidth: 1.5, fill: 'none' };
-
+  const s = { stroke: color, strokeWidth: 1.5, fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   switch (category) {
     case 'frontend':
       return (
-        <svg width="24" height="24" viewBox="0 0 24 24" {...iconStyle}>
+        <svg width="20" height="20" viewBox="0 0 24 24" {...s}>
           <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
         </svg>
       );
     case 'backend':
       return (
-        <svg width="24" height="24" viewBox="0 0 24 24" {...iconStyle}>
+        <svg width="20" height="20" viewBox="0 0 24 24" {...s}>
           <rect x="2" y="3" width="20" height="6" rx="2" />
           <rect x="2" y="15" width="20" height="6" rx="2" />
           <circle cx="6" cy="6" r="1" fill={color} />
@@ -112,7 +122,7 @@ function CategoryIcon({ category, color }: { category: SkillCategory; color: str
       );
     case 'databases':
       return (
-        <svg width="24" height="24" viewBox="0 0 24 24" {...iconStyle}>
+        <svg width="20" height="20" viewBox="0 0 24 24" {...s}>
           <ellipse cx="12" cy="5" rx="9" ry="3" />
           <path d="M21 12c0 1.66-4.03 3-9 3s-9-1.34-9-3" />
           <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
@@ -120,7 +130,7 @@ function CategoryIcon({ category, color }: { category: SkillCategory; color: str
       );
     case 'ai':
       return (
-        <svg width="24" height="24" viewBox="0 0 24 24" {...iconStyle}>
+        <svg width="20" height="20" viewBox="0 0 24 24" {...s}>
           <path d="M12 2a4 4 0 014 4c0 1.1-.9 2-2 2h-4a2 2 0 01-2-2 4 4 0 014-4z" />
           <path d="M8 8v2a4 4 0 008 0V8" />
           <path d="M12 14v4M8 22h8M10 18h4" />
@@ -130,272 +140,184 @@ function CategoryIcon({ category, color }: { category: SkillCategory; color: str
       );
     case 'automation':
       return (
-        <svg width="24" height="24" viewBox="0 0 24 24" {...iconStyle}>
+        <svg width="20" height="20" viewBox="0 0 24 24" {...s}>
           <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
           <circle cx="12" cy="12" r="3" />
         </svg>
       );
     case 'devops':
       return (
-        <svg width="24" height="24" viewBox="0 0 24 24" {...iconStyle}>
+        <svg width="20" height="20" viewBox="0 0 24 24" {...s}>
           <path d="M4 14a1 1 0 01-.78-1.63l9.9-10.2a.5.5 0 01.86.46l-1.92 6.02A1 1 0 0013 10h7a1 1 0 01.78 1.63l-9.9 10.2a.5.5 0 01-.86-.46l1.92-6.02A1 1 0 0011 14H4z" />
         </svg>
       );
-    default:
-      return null;
   }
 }
 
-// ============================================
-// TECH CARD COMPONENT
-// ============================================
+function TechBadge({ name, color }: { name: string; color: string }) {
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono rounded-lg border transition-all duration-200 hover:scale-105 hover:-translate-y-0.5"
+      style={{
+        borderColor: 'rgba(255,255,255,0.06)',
+        backgroundColor: 'rgba(255,255,255,0.02)',
+        color: '#a0a0a0',
+      }}
+    >
+      <span
+        className="w-1.5 h-1.5 rounded-full shrink-0"
+        style={{ backgroundColor: color }}
+      />
+      {name}
+    </span>
+  );
+}
 
-function TechCard({
+function BentoCard({
   category,
   index,
-  isExpanded,
-  onToggle,
+  isVisible,
 }: {
-  category: TechCategory;
+  category: CategoryData;
   index: number;
-  isExpanded: boolean;
-  onToggle: () => void;
+  isVisible: boolean;
 }) {
-  const progressRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isExpanded) return;
-
-    const validBars = progressRefs.current.filter(Boolean) as HTMLDivElement[];
-    if (validBars.length === 0) return;
-
-    // Reset bars before animating
-    validBars.forEach((bar) => {
-      bar.style.width = '0%';
-    });
-
-    const anim = animate(validBars, {
-      width: (_el: Element, i: number) => `${category.technologies[i]?.level ?? 0}%`,
-      duration: 800,
-      delay: stagger(100, { start: 200 }),
-      ease: 'outExpo',
-    });
-
-    return () => {
-      anim.pause();
-    };
-  }, [isExpanded, category.technologies]);
-
   return (
-    <div
-      className="tech-card group relative cursor-pointer"
-      style={{ '--card-color': category.color } as React.CSSProperties}
-      onClick={onToggle}
+    <motion.div
+      className="group relative"
+      initial={{ opacity: 0, y: 40 }}
+      animate={isVisible ? { opacity: 1, y: 0 } : undefined}
+      transition={{
+        duration: 0.7,
+        delay: index * 0.1,
+        ease: [0.25, 0.4, 0.25, 1],
+      }}
     >
-      {/* Card body */}
-      <div
-        className={`
-          relative overflow-hidden rounded-2xl
-          bg-white/[0.03] backdrop-blur-xl border border-white/[0.06]
-          transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
-          hover:bg-white/[0.05] hover:scale-[1.02]
-        `}
+      <motion.div
+        className="relative overflow-hidden rounded-2xl border h-full"
         style={{
-          borderColor: isExpanded ? `${category.color}30` : undefined,
-          boxShadow: isExpanded
-            ? `0 0 40px ${category.color}15, 0 0 80px ${category.color}08, 0 0 0 1px ${category.color}20`
-            : undefined,
+          backgroundColor: 'rgba(255,255,255,0.02)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderColor: 'rgba(255,255,255,0.05)',
+        }}
+        whileHover={{
+          y: -4,
+          borderColor: `${category.color}30`,
+          boxShadow: `0 12px 48px ${category.color}12, 0 0 80px ${category.color}05`,
+          transition: { duration: 0.3, ease: 'easeOut' },
         }}
       >
-        {/* Top accent line */}
+        {/* Top accent */}
         <div
-          className="absolute top-0 left-0 right-0 h-[1px] opacity-60"
+          className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-60 transition-opacity duration-300"
           style={{
             background: `linear-gradient(90deg, transparent, ${category.color}, transparent)`,
           }}
         />
 
-        {/* Header */}
-        <div className="p-[32px] flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
-              style={{ backgroundColor: `${category.color}15` }}
+        {/* Spotlight on hover */}
+        <motion.div
+          className="pointer-events-none absolute -inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background: `radial-gradient(500px circle at 50% 0%, ${category.color}08, transparent 60%)`,
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 flex h-full min-h-[176px] flex-col gap-4 p-5 md:min-h-[180px] md:p-6">
+          {/* Header */}
+          <div className="flex items-start gap-3">
+            <motion.div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+              style={{ backgroundColor: `${category.color}10` }}
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 15 }}
             >
               <CategoryIcon category={category.key} color={category.color} />
-            </div>
+            </motion.div>
             <div>
-              <h3 className="text-white font-semibold text-lg leading-tight">
+              <h3 className="text-base font-semibold text-white leading-tight">
                 {category.name}
               </h3>
-              <p className="text-[#A0A0A0] text-sm mt-0.5">{category.description}</p>
+              <p className="mt-2 text-[11px] font-mono text-[#606060]">
+                {category.description}
+              </p>
             </div>
           </div>
 
-          {/* Expand indicator */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-[#A0A0A0] font-mono opacity-0 group-hover:opacity-100 transition-opacity">
-              {category.technologies.length}
-            </span>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              className={`text-[#A0A0A0] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
-            >
-              <path
-                d="M4 6l4 4 4-4"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-        </div>
-
-        {/* Expandable content */}
-        <div
-          ref={contentRef}
-          className="overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
-          style={{
-            maxHeight: isExpanded ? `${category.technologies.length * 80 + 40}px` : '0px',
-            opacity: isExpanded ? 1 : 0,
-          }}
-        >
-          <div className="px-[32px] pb-[32px] space-y-6">
-            {category.technologies.map((tech: Skill, i: number) => (
-              <div key={tech.name} className="group/tech">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm text-white/80 font-medium">{tech.name}</span>
-                  <span
-                    className="text-xs font-mono"
-                    style={{ color: category.color }}
-                  >
-                    {tech.level}%
-                  </span>
-                </div>
-                <div className="h-[2px] rounded-full bg-white/[0.04] overflow-hidden">
-                  <div
-                    ref={(el) => { progressRefs.current[i] = el; }}
-                    className="h-full rounded-full transition-colors"
-                    style={{
-                      backgroundColor: category.color,
-                      width: '0%',
-                      opacity: 0.85,
-                    }}
-                  />
-                </div>
-              </div>
+          {/* Tech pills */}
+          <div className="flex flex-wrap gap-2">
+            {category.techs.map((tech) => (
+              <TechBadge key={tech.name} name={tech.name} color={category.color} />
             ))}
           </div>
+
+          {/* Footer stats */}
+          <div className="mt-auto flex items-center gap-4 border-t border-white/[0.04] pt-4 text-[10px] font-mono text-[#606060]">
+            <span>
+              <span style={{ color: category.color }}>{category.techs.length}</span> technologies
+            </span>
+            <span className="w-px h-4 bg-white/[0.06]" />
+            <span>
+              <span style={{ color: category.color }}>
+                {category.techs.reduce((a, t) => a + (t.projects || 0), 0)}
+              </span>{' '}
+              projects
+            </span>
+          </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
-// ============================================
-// MAIN SECTION
-// ============================================
-
 export default function TechArsenal() {
   const sectionRef = useRef<HTMLElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
-
-  const handleToggle = useCallback((index: number) => {
-    setExpandedIndex((prev) => (prev === index ? null : index));
-  }, []);
-
-  // Scroll-triggered entrance animation
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-
-          // Animate title
-          if (titleRef.current) {
-            animate(titleRef.current, {
-              opacity: [0, 1],
-              translateY: [40, 0],
-              duration: 800,
-              ease: 'outExpo',
-            });
-          }
-
-          // Animate cards with stagger
-          const cards = gridRef.current?.querySelectorAll('.tech-card');
-          if (cards && cards.length > 0) {
-            animate(cards, {
-              opacity: [0, 1],
-              translateY: [60, 0],
-              scale: [0.95, 1],
-              duration: 800,
-              delay: stagger(100, { start: 300 }),
-              ease: 'outExpo',
-            });
-          }
-        }
-      },
-      { threshold: 0.15 }
-    );
-
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, [hasAnimated]);
+  const isInView = useInView(sectionRef, { once: true, margin: '-100px' });
 
   return (
     <section
       ref={sectionRef}
       id="tech"
-      className="relative w-full overflow-hidden"
+      className="relative -mt-4 w-full overflow-hidden md:-mt-8 lg:-mt-12"
     >
-      {/* Subtle background radial */}
+      {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-[0.03]"
-          style={{
-            background: 'radial-gradient(circle, #4F8CFF 0%, transparent 70%)',
-          }}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full opacity-[0.02]"
+          style={{ background: 'radial-gradient(circle, #4F8CFF 0%, transparent 70%)' }}
         />
       </div>
 
       <div className="section-container relative z-10 flex flex-col items-center">
         {/* Title */}
-        <div ref={titleRef} className="opacity-0 w-full max-w-5xl flex flex-col items-center text-center">
-          <p className="text-[#4F8CFF] text-sm font-mono tracking-widest uppercase mb-4">
-            <span className="mx-2 inline-block h-px w-6 bg-accent align-middle" />
-            {'// Skills & Technologies'}
-            <span className="mx-2 inline-block h-px w-6 bg-accent align-middle" />
-          </p>
-          <h2 className="section-title gradient-text mb-[20px]">Tech Arsenal</h2>
-          <p className="section-subtitle mb-[56px] max-w-2xl mx-auto text-center leading-[1.7]">
-            The tools and technologies I wield to build exceptional digital experiences.
-          </p>
-        </div>
-
-        {/* Grid */}
-        <div
-          ref={gridRef}
-          className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[16px] md:gap-[24px] lg:gap-[32px]"
+        <motion.div
+          className="section-header max-w-4xl"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1] }}
         >
-          {TECH_CATEGORIES.map((cat, i) => (
-            <TechCard
-              key={cat.key}
-              category={cat}
-              index={i}
-              isExpanded={expandedIndex === i}
-              onToggle={() => handleToggle(i)}
-            />
+          <p className="section-eyebrow text-[11px] font-mono text-[#4F8CFF] tracking-[0.2em] uppercase">
+            <span className="mr-2 inline-block h-px w-5 bg-accent align-middle" />
+            {'// Tools & Technologies'}
+            <span className="ml-2 inline-block h-px w-5 bg-accent align-middle" />
+          </p>
+          <h2
+            data-cursor-text="Arsenal"
+            data-cursor-color="white"
+            className="section-heading text-[clamp(2rem,4vw,3rem)] font-bold tracking-tight text-white leading-[1.05]"
+          >
+            Tech Arsenal
+          </h2>
+          <p className="section-description text-sm leading-relaxed text-[#808080]">
+            The stack I reach for most often when building fast, polished products and reliable AI systems.
+          </p>
+        </motion.div>
+
+        {/* Bento Grid — 2 columns on desktop */}
+        <div className="grid w-full max-w-7xl grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 xl:grid-cols-3 xl:gap-6">
+          {CATEGORIES.map((cat, i) => (
+            <BentoCard key={cat.key} category={cat} index={i} isVisible={isInView} />
           ))}
         </div>
       </div>

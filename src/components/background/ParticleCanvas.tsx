@@ -29,9 +29,15 @@ export default function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0);
   const mouseRef = useRef({ x: -1000, y: -1000 });
+  const scrollYRef = useRef(0);
   const particlesRef = useRef<Particle[]>([]);
   const shapesRef = useRef<GeometricShape[]>([]);
   const prefersReduced = useReducedMotion();
+  
+  // OPTIMIZATION: Throttle mouse events to 60Hz max (16.67ms)
+  const lastMouseUpdateRef = useRef(0);
+  const frameCountRef = useRef(0);
+  const avgFrameTimeRef = useRef(16.67);
 
   const initParticles = useCallback(
     (width: number, height: number) => {
@@ -151,17 +157,48 @@ export default function ParticleCanvas() {
     resize();
     window.addEventListener('resize', resize);
 
+    const handleScroll = () => {
+      scrollYRef.current = window.scrollY;
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // OPTIMIZATION: Throttle mouse events to prevent excessive calculations
     const handleMouse = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
+      const now = performance.now();
+      // Only update if 16.67ms has passed (60Hz throttle)
+      if (now - lastMouseUpdateRef.current > 16.67) {
+        mouseRef.current = { x: e.clientX, y: e.clientY };
+        lastMouseUpdateRef.current = now;
+      }
     };
     window.addEventListener('mousemove', handleMouse, { passive: true });
 
     const maxConnectionDist = 120;
+    const maxConnectionDistSq = maxConnectionDist * maxConnectionDist;
     const mouseInfluenceRadius = 150;
 
     const renderFrame = () => {
+      const now = performance.now();
+      frameCountRef.current++;
+      
+      // OPTIMIZATION: Monitor frame performance
+      if (frameCountRef.current > 0 && frameCountRef.current % 10 === 0) {
+        const elapsed = (now - lastMouseUpdateRef.current) / 10;
+        avgFrameTimeRef.current = avgFrameTimeRef.current * 0.8 + elapsed * 0.2;
+      }
+      
+      const isSlowFrame = avgFrameTimeRef.current > 18; // > 55fps
+
       const w = window.innerWidth;
       const h = window.innerHeight;
+      const isLowerPage = scrollYRef.current > h * 1.5;
+
+      // Skip all rendering when scrolled past hero area
+      if (isLowerPage) {
+        animationRef.current = requestAnimationFrame(renderFrame);
+        return;
+      }
 
       ctx.clearRect(0, 0, w, h);
 
@@ -182,15 +219,16 @@ export default function ParticleCanvas() {
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Mouse repulsion
+        // Mouse repulsion - optimized division/multiplication
         const dmx = p.x - mx;
         const dmy = p.y - my;
         const mouseDistSq = dmx * dmx + dmy * dmy;
         if (mouseDistSq < mouseInfluenceRadius * mouseInfluenceRadius && mouseDistSq > 0) {
           const mouseDist = Math.sqrt(mouseDistSq);
           const force = (mouseInfluenceRadius - mouseDist) / mouseInfluenceRadius;
-          p.vx += (dmx / mouseDist) * force * 0.02;
-          p.vy += (dmy / mouseDist) * force * 0.02;
+          const factor = (force * 0.02) / mouseDist;
+          p.vx += dmx * factor;
+          p.vy += dmy * factor;
         }
 
         // Damping
@@ -212,24 +250,74 @@ export default function ParticleCanvas() {
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
         ctx.fill();
+      }
 
-        // Draw connections (only check forward to avoid duplicates)
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const distSq = dx * dx + dy * dy;
+      // OPTIMIZATION: Batch connection drawing (only when frame rates are stable)
+      if (!isSlowFrame) {
+        const lowConn: [number, number, number, number][] = [];
+        const medConn: [number, number, number, number][] = [];
+        const highConn: [number, number, number, number][] = [];
 
-          if (distSq < maxConnectionDist * maxConnectionDist) {
-            const dist = Math.sqrt(distSq);
-            const alpha = (1 - dist / maxConnectionDist) * 0.12;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(79, 140, 255, ${alpha})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          let connectionsDrawn = 0;
+          
+          for (let j = i + 1; j < particles.length && connectionsDrawn < 4; j++) {
+            const p2 = particles[j];
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq < maxConnectionDistSq) {
+              const dist = Math.sqrt(distSq);
+              const alpha = (1 - dist / maxConnectionDist) * 0.12;
+              
+              if (alpha > 0.08) {
+                highConn.push([p.x, p.y, p2.x, p2.y]);
+              } else if (alpha > 0.04) {
+                medConn.push([p.x, p.y, p2.x, p2.y]);
+              } else if (alpha > 0) {
+                lowConn.push([p.x, p.y, p2.x, p2.y]);
+              }
+              connectionsDrawn++;
+            }
           }
+        }
+
+        // Draw low connections batched
+        if (lowConn.length > 0) {
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(79, 140, 255, 0.02)';
+          ctx.lineWidth = 0.5;
+          for (let k = 0; k < lowConn.length; k++) {
+            ctx.moveTo(lowConn[k][0], lowConn[k][1]);
+            ctx.lineTo(lowConn[k][2], lowConn[k][3]);
+          }
+          ctx.stroke();
+        }
+
+        // Draw medium connections batched
+        if (medConn.length > 0) {
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(79, 140, 255, 0.05)';
+          ctx.lineWidth = 0.5;
+          for (let k = 0; k < medConn.length; k++) {
+            ctx.moveTo(medConn[k][0], medConn[k][1]);
+            ctx.lineTo(medConn[k][2], medConn[k][3]);
+          }
+          ctx.stroke();
+        }
+
+        // Draw high connections batched
+        if (highConn.length > 0) {
+          ctx.beginPath();
+          ctx.strokeStyle = 'rgba(79, 140, 255, 0.1)';
+          ctx.lineWidth = 0.5;
+          for (let k = 0; k < highConn.length; k++) {
+            ctx.moveTo(highConn[k][0], highConn[k][1]);
+            ctx.lineTo(highConn[k][2], highConn[k][3]);
+          }
+          ctx.stroke();
         }
       }
 
@@ -263,9 +351,24 @@ export default function ParticleCanvas() {
 
     animationRef.current = requestAnimationFrame(renderFrame);
 
+    // OPTIMIZATION: Pause animation when document is hidden / tab is inactive
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = 0;
+      } else {
+        if (!animationRef.current) {
+          animationRef.current = requestAnimationFrame(renderFrame);
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       cancelAnimationFrame(animationRef.current);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('resize', resize);
+      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouse);
     };
   }, [initParticles]);

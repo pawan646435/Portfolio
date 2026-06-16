@@ -38,11 +38,6 @@ const TechArsenal = dynamic(
   { ssr: false }
 );
 
-const GitHubVisualization = dynamic(
-  () => import("@/components/sections/GitHubVisualization"),
-  { ssr: false }
-);
-
 const ContactExperience = dynamic(
   () => import("@/components/sections/ContactExperience"),
   { ssr: false }
@@ -50,7 +45,7 @@ const ContactExperience = dynamic(
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen" style={{ background: "#050505" }}>
+    <main className="relative" style={{ background: "#050505" }}>
       {/* Living background */}
       <ParticleCanvas />
 
@@ -59,12 +54,11 @@ export default function Home() {
 
       {/* Content sections */}
       <div className="relative z-10">
+        <EngineeringJourney />
         <WhoIAm />
         <CoreExpertise />
         <ProjectShowcase />
-        <EngineeringJourney />
         <TechArsenal />
-        <GitHubVisualization />
         <ContactExperience />
       </div>
     </main>

@@ -1,147 +1,154 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
-import { animate, stagger } from 'animejs';
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 
-// ============================================
-// TYPES
-// ============================================
-
-interface TerminalLine {
-  text: string;
-  href?: string;
-  isCheckmark: boolean;
-}
-
-// ============================================
-// DATA
-// ============================================
-
-const TERMINAL_COMMAND = '> connect --developer';
-
-const TERMINAL_LINES: TerminalLine[] = [
+const CONTACT_METHODS = [
   {
-    text: '✓ Email Connected',
+    title: 'Email',
+    subtitle: 'pawan646435@gmail.com',
     href: 'mailto:pawan646435@gmail.com',
-    isCheckmark: true,
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="4" width="20" height="16" rx="2" />
+        <path d="M22 4L12 13 2 4" />
+      </svg>
+    ),
+    cta: 'Email Me',
   },
   {
-    text: '✓ GitHub Connected',
-    href: 'https://github.com/pawan646435',
-    isCheckmark: true,
-  },
-  {
-    text: '✓ LinkedIn Connected',
+    title: 'LinkedIn',
+    subtitle: 'Connect professionally',
     href: 'https://www.linkedin.com/in/pawan646435/',
-    isCheckmark: true,
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
+        <circle cx="4" cy="4" r="2" />
+      </svg>
+    ),
+    cta: 'Connect',
   },
   {
-    text: '✓ Ready for Opportunities',
-    isCheckmark: true,
+    title: 'GitHub',
+    subtitle: 'pawan646435',
+    href: 'https://github.com/pawan646435',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+      </svg>
+    ),
+    cta: 'Browse',
+  },
+  {
+    title: 'Resume',
+    subtitle: 'Download PDF',
+    href: '#',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+        <polyline points="10 9 9 9 8 9" />
+      </svg>
+    ),
+    cta: 'View Resume',
   },
 ];
 
-// ============================================
-// MAIN SECTION
-// ============================================
+function ContactCard({
+  method,
+  index,
+  isVisible,
+}: {
+  method: (typeof CONTACT_METHODS)[number];
+  index: number;
+  isVisible: boolean;
+}) {
+  return (
+    <motion.a
+      href={method.href}
+      target={method.href.startsWith('mailto:') ? undefined : '_blank'}
+      rel={method.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
+      className="group block"
+      initial={{ opacity: 0, y: 20 }}
+      animate={isVisible ? { opacity: 1, y: 0 } : undefined}
+      transition={{ duration: 0.4, delay: index * 0.08, ease: [0.25, 0.4, 0.25, 1] }}
+    >
+      <motion.div
+        className="relative overflow-hidden rounded-xl border h-full p-4"
+        style={{
+          backgroundColor: 'rgba(255,255,255,0.02)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderColor: 'rgba(255,255,255,0.05)',
+        }}
+        whileHover={{
+          y: -3,
+          borderColor: 'rgba(79,140,255,0.25)',
+          boxShadow: '0 8px 32px rgba(79,140,255,0.08), 0 0 0 1px rgba(79,140,255,0.06)',
+          transition: { duration: 0.25, ease: 'easeOut' },
+        }}
+      >
+        {/* Spotlight */}
+        <motion.div
+          className="pointer-events-none absolute -inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          style={{
+            background: 'radial-gradient(300px circle at 50% 0%, rgba(79,140,255,0.06), transparent 60%)',
+          }}
+        />
+
+        {/* Top accent */}
+        <div
+          className="absolute top-0 left-0 right-0 h-px opacity-0 group-hover:opacity-40 transition-opacity duration-300"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(79,140,255,0.5), transparent)',
+          }}
+        />
+
+        <div className="relative z-10 flex items-center gap-3">
+          {/* Icon */}
+          <motion.div
+            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+            style={{ backgroundColor: 'rgba(79,140,255,0.08)', color: '#4F8CFF' }}
+            whileHover={{ scale: 1.1 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+          >
+            {method.icon}
+          </motion.div>
+
+          {/* Text */}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-white leading-tight">
+              {method.title}
+            </p>
+            <p className="text-[11px] font-mono text-[#808080] mt-0.5 truncate">
+              {method.subtitle}
+            </p>
+          </div>
+
+          {/* CTA */}
+          <span
+            className="inline-flex items-center gap-1 px-3 py-1.5 text-[10px] font-semibold rounded-lg transition-all duration-200 shrink-0"
+            style={{
+              backgroundColor: 'rgba(79,140,255,0.1)',
+              color: '#4F8CFF',
+            }}
+          >
+            {method.cta}
+            <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 6h8M6 2l4 4-4 4" />
+            </svg>
+          </span>
+        </div>
+      </motion.div>
+    </motion.a>
+  );
+}
 
 export default function ContactExperience() {
   const sectionRef = useRef<HTMLElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
-  const terminalRef = useRef<HTMLDivElement>(null);
-  const commandRef = useRef<HTMLSpanElement>(null);
-  const linesContainerRef = useRef<HTMLDivElement>(null);
-  const cursorRef = useRef<HTMLSpanElement>(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const [typedCommand, setTypedCommand] = useState('');
-  const [showLines, setShowLines] = useState(false);
-  const [showCursor, setShowCursor] = useState(true);
-  const [animationComplete, setAnimationComplete] = useState(false);
-
-  // Typing animation for command
-  const startTypingAnimation = useCallback(() => {
-    let charIndex = 0;
-
-    const typeInterval = setInterval(() => {
-      charIndex++;
-      setTypedCommand(TERMINAL_COMMAND.slice(0, charIndex));
-
-      if (charIndex >= TERMINAL_COMMAND.length) {
-        clearInterval(typeInterval);
-
-        // Brief pause then reveal response lines
-        setTimeout(() => {
-          setShowLines(true);
-
-          // Stagger-animate the response lines
-          const lines = linesContainerRef.current?.querySelectorAll('.terminal-line');
-          if (lines && lines.length > 0) {
-            animate(lines, {
-              opacity: [0, 1],
-              translateX: [-20, 0],
-              duration: 500,
-              delay: stagger(200, { start: 100 }),
-              ease: 'outCubic',
-              onComplete: () => {
-                setAnimationComplete(true);
-              },
-            });
-          }
-        }, 400);
-      }
-    }, 60);
-
-    return typeInterval;
-  }, []);
-
-  // IntersectionObserver trigger
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    let typeInterval: ReturnType<typeof setInterval> | null = null;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-
-          // Animate title
-          if (titleRef.current) {
-            animate(titleRef.current, {
-              opacity: [0, 1],
-              translateY: [30, 0],
-              duration: 800,
-              ease: 'outExpo',
-            });
-          }
-
-          // Animate terminal container
-          if (terminalRef.current) {
-            animate(terminalRef.current, {
-              opacity: [0, 1],
-              translateY: [40, 0],
-              scale: [0.97, 1],
-              duration: 900,
-              delay: 200,
-              ease: 'outExpo',
-              onComplete: () => {
-                // Start typing after terminal appears
-                typeInterval = startTypingAnimation();
-              },
-            });
-          }
-        }
-      },
-      { threshold: 0.2 }
-    );
-
-    observer.observe(section);
-    return () => {
-      observer.disconnect();
-      if (typeInterval) clearInterval(typeInterval);
-    };
-  }, [hasAnimated, startTypingAnimation]);
+  const isInView = useInView(sectionRef, { once: true, margin: '-80px' });
 
   return (
     <section
@@ -149,155 +156,120 @@ export default function ContactExperience() {
       id="contact"
       className="relative w-full overflow-hidden"
     >
-      {/* Background accent */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Background glow */}
+      <div className="pointer-events-none absolute inset-0">
         <div
-          className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] rounded-full opacity-[0.02]"
+          className="absolute top-1/2 right-1/4 h-[500px] w-[500px] rounded-full opacity-[0.02]"
           style={{
-            background: 'radial-gradient(circle, #4ADE80 0%, transparent 70%)',
+            background: 'radial-gradient(circle, #4F8CFF 0%, transparent 70%)',
           }}
         />
       </div>
 
       <div className="section-container relative z-10">
-        {/* Title */}
-        <div ref={titleRef} className="text-center opacity-0">
-          <p className="text-[#4F8CFF] text-sm font-mono tracking-widest uppercase mb-4">
+        {/* Header */}
+        <motion.div
+          className="section-header"
+          initial={{ opacity: 0, y: 24 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
+        >
+          <p className="section-eyebrow text-[11px] font-mono text-[#4F8CFF] tracking-[0.2em] uppercase">
+            <span className="mr-2 inline-block h-px w-5 bg-accent align-middle" />
             {'// Get In Touch'}
+            <span className="ml-2 inline-block h-px w-5 bg-accent align-middle" />
           </p>
-          <h2 className="section-title gradient-text mx-auto mb-[24px]">
-            Let&apos;s Connect
-          </h2>
-          <p className="section-subtitle mt-3 mx-auto text-center mb-[64px]">
-            Always open to new opportunities and interesting conversations.
-          </p>
-        </div>
-
-        {/* Terminal window */}
-        <div className="max-w-2xl mx-auto">
-          <div
-            ref={terminalRef}
-            className="rounded-2xl bg-white/[0.03] backdrop-blur-xl border border-white/[0.06] overflow-hidden opacity-0"
+          <h2
+            className="section-heading text-[clamp(1.8rem,4.5vw,3rem)] font-bold tracking-tight text-white leading-[1.05]"
+            data-cursor-text="Build Together"
+            data-cursor-color="white"
           >
-            {/* Window chrome */}
-            <div className="flex items-center gap-2 px-5 py-3.5 border-b border-white/[0.06]">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#FF5F57] opacity-80" />
-                <span className="w-3 h-3 rounded-full bg-[#FEBC2E] opacity-80" />
-                <span className="w-3 h-3 rounded-full bg-[#28C840] opacity-80" />
-              </div>
-              <div className="flex-1 text-center">
-                <span className="text-xs font-mono text-[#A0A0A0]/60">
-                  terminal — contact
+            Let&apos;s Build Together
+          </h2>
+          <p className="section-description text-xs text-[#808080]">
+            Open to full-stack engineering, AI development, automation projects, and exciting opportunities.
+          </p>
+        </motion.div>
+
+        {/* Two-column layout */}
+        <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-5">
+          {/* Left — Intro */}
+          <motion.div
+            className="lg:col-span-2 flex flex-col justify-center"
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.15, ease: [0.25, 0.4, 0.25, 1] }}
+          >
+            <div
+              className="rounded-xl border p-5 md:p-6 h-full"
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.02)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                borderColor: 'rgba(255,255,255,0.05)',
+              }}
+            >
+              <p className="text-sm text-[#a0a0a0] leading-relaxed mb-5">
+                I&apos;m currently exploring new opportunities where I can contribute to meaningful products — whether it&apos;s architecting AI systems, building full-stack platforms, or automating complex workflows.
+              </p>
+
+              {/* Availability */}
+              <div className="flex items-center gap-3 mb-3">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
                 </span>
-              </div>
-              {/* Spacer to balance the dots */}
-              <div className="w-[52px]" />
-            </div>
-
-            {/* Terminal body */}
-            <div className="p-6 md:p-8 font-mono text-sm leading-relaxed min-h-[240px]">
-              {/* Command line */}
-              <div className="flex items-center">
-                <span className="text-[#4ADE80] select-none">
-                  {typedCommand}
-                </span>
-                {!showLines && showCursor && (
-                  <span className="cursor-blink ml-0.5" />
-                )}
-              </div>
-
-              {/* Response lines */}
-              {showLines && (
-                <div ref={linesContainerRef} className="mt-4 space-y-2.5">
-                  {TERMINAL_LINES.map((line, i) => (
-                    <div
-                      key={i}
-                      className="terminal-line opacity-0"
-                    >
-                      {line.href ? (
-                        <a
-                          href={line.href}
-                          target={line.href.startsWith('mailto:') ? undefined : '_blank'}
-                          rel={line.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
-                          className="group/link inline-flex items-center gap-1"
-                        >
-                          <span className="text-[#4ADE80]">✓</span>
-                          <span className="text-white/80 group-hover/link:text-white group-hover/link:underline underline-offset-4 decoration-white/30 transition-colors duration-200">
-                            {line.text.replace('✓ ', '')}
-                          </span>
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                            className="text-[#A0A0A0] opacity-0 group-hover/link:opacity-100 transition-opacity ml-1"
-                          >
-                            <path
-                              d="M4 2h6v6M10 2L4.5 7.5"
-                              stroke="currentColor"
-                              strokeWidth="1"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </a>
-                      ) : (
-                        <div className="inline-flex items-center gap-1">
-                          <span className="text-[#4ADE80]">✓</span>
-                          <span className="text-white/80">
-                            {line.text.replace('✓ ', '')}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-
-                  {/* Blinking cursor at end */}
-                  {animationComplete && (
-                    <div className="mt-3 flex items-center">
-                      <span className="text-[#A0A0A0]">{'>'}</span>
-                      <span className="cursor-blink ml-1.5" />
-                    </div>
-                  )}
+                <div>
+                  <p className="text-sm font-medium text-white">Available for opportunities</p>
+                  <p className="text-[10px] font-mono text-[#606060]">Freelance &bull; Contract &bull; Full-time</p>
                 </div>
-              )}
+              </div>
+
+              {/* Response time */}
+              <div className="flex items-center gap-3 pt-3 border-t border-white/[0.04]">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4F8CFF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <p className="text-[11px] font-mono text-[#606060]">
+                  Response time: <span className="text-[#a0a0a0]">usually within 24h</span>
+                </p>
+              </div>
             </div>
+          </motion.div>
+
+          {/* Right — Contact cards */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:col-span-3">
+            {CONTACT_METHODS.map((method, i) => (
+              <ContactCard key={method.title} method={method} index={i} isVisible={isInView} />
+            ))}
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="mt-24 pt-8 border-t border-white/[0.06]">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-[#A0A0A0] text-sm">
-              © 2026 Pawan Kumar. Built with Next.js
-            </p>
-            <div className="flex items-center gap-6">
-              <a
-                href="mailto:pawan646435@gmail.com"
-                className="text-[#A0A0A0] hover:text-white text-sm transition-colors duration-200"
-              >
-                Email
-              </a>
-              <a
-                href="https://github.com/pawan646435"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#A0A0A0] hover:text-white text-sm transition-colors duration-200"
-              >
-                GitHub
-              </a>
-              <a
-                href="https://www.linkedin.com/in/pawan646435/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#A0A0A0] hover:text-white text-sm transition-colors duration-200"
-              >
-                LinkedIn
-              </a>
-            </div>
+        <motion.footer
+          className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-white/[0.05] pt-6 sm:flex-row"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.4, delay: 0.4 }}
+        >
+          <p className="text-[11px] text-[#606060] font-mono">
+            &copy; 2026 Pawan Kumar &mdash; Built with Next.js
+          </p>
+          <div className="flex items-center gap-4">
+            <a href="mailto:pawan646435@gmail.com" className="text-[11px] text-[#606060] hover:text-white transition-colors font-mono">
+              Email
+            </a>
+            <span className="text-[#383838]">/</span>
+            <a href="https://github.com/pawan646435" target="_blank" rel="noopener noreferrer" className="text-[11px] text-[#606060] hover:text-white transition-colors font-mono">
+              GitHub
+            </a>
+            <span className="text-[#383838]">/</span>
+            <a href="https://www.linkedin.com/in/pawan646435/" target="_blank" rel="noopener noreferrer" className="text-[11px] text-[#606060] hover:text-white transition-colors font-mono">
+              LinkedIn
+            </a>
           </div>
-        </footer>
+        </motion.footer>
       </div>
     </section>
   );

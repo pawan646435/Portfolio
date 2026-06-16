@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { animate, stagger } from 'animejs';
-import { useAnimeOnScroll } from '@/hooks/useAnimeOnScroll';
+import React, { useRef, useEffect, useState } from 'react';
+import { animate, useInView } from 'framer-motion';
 
 /* ─── Types ─── */
 interface SkillNode {
@@ -120,12 +119,7 @@ function DetailPanel({
   useEffect(() => {
     const el = panelRef.current;
     if (!el) return;
-    animate(el, {
-      opacity: [0, 1],
-      translateY: [12, 0],
-      duration: 400,
-      ease: 'easeOutCubic',
-    });
+    animate(el, { opacity: [0, 1], y: [12, 0] }, { duration: 0.4, ease: 'easeOut' });
   }, []);
 
   return (
@@ -165,6 +159,32 @@ function OrbitalCanvas() {
   const linesRef = useRef<(SVGLineElement | null)[]>([]);
   const dashOffsetRef = useRef(0);
 
+  const [isInView, setIsInView] = useState(false);
+  const [isTabVisible, setIsTabVisible] = useState(true);
+
+  /* IntersectionObserver to pause loop when offscreen */
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  /* Listen for tab visibility changes */
+  useEffect(() => {
+    const handleVisibility = () => {
+      setIsTabVisible(document.visibilityState === 'visible');
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
   /* Resize handler */
   useEffect(() => {
     const el = containerRef.current;
@@ -193,7 +213,10 @@ function OrbitalCanvas() {
 
   /* Animation loop */
   useEffect(() => {
-    if (dimensions.width === 0) return;
+    if (dimensions.width === 0 || !isInView || !isTabVisible) {
+      lastTimeRef.current = 0;
+      return;
+    }
 
     const cx = dimensions.width / 2;
     const cy = dimensions.height / 2;
@@ -241,7 +264,7 @@ function OrbitalCanvas() {
 
     animRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animRef.current);
-  }, [dimensions]);
+  }, [dimensions, isInView, isTabVisible]);
 
   return (
     <div ref={containerRef} className="relative h-full w-full">
@@ -257,13 +280,6 @@ function OrbitalCanvas() {
             <stop offset="0%" stopColor="#4F8CFF" stopOpacity="0.15" />
             <stop offset="100%" stopColor="#4F8CFF" stopOpacity="0" />
           </radialGradient>
-          <filter id="node-glow">
-            <feGaussianBlur stdDeviation="4" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
         </defs>
 
         {/* Center glow */}
@@ -293,7 +309,9 @@ function OrbitalCanvas() {
         {/* Center node */}
         <g transform={`translate(${dimensions.width / 2}, ${dimensions.height / 2})`}>
           <circle r="38" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-          <circle r="4" fill="#4F8CFF" filter="url(#node-glow)" />
+          <circle r="12" fill="#4F8CFF" opacity="0.15" />
+          <circle r="8" fill="#4F8CFF" opacity="0.4" />
+          <circle r="4" fill="#4F8CFF" />
           <text
             y="-50"
             textAnchor="middle"
@@ -324,6 +342,8 @@ function OrbitalCanvas() {
             key={skill.id}
             ref={(el) => { nodeGroupsRef.current[i] = el; }}
             className="cursor-pointer"
+            data-cursor-text="Explore"
+            data-cursor-color="white"
             onClick={() => setActiveSkill(activeSkill?.id === skill.id ? null : skill)}
           >
             {/* outer ring */}
@@ -340,10 +360,22 @@ function OrbitalCanvas() {
             />
             {/* accent dot */}
             <circle
+              r="10"
+              fill="#4F8CFF"
+              opacity={activeSkill?.id === skill.id ? 0.15 : 0.08}
+              className="transition-opacity duration-300"
+            />
+            <circle
+              r="6"
+              fill="#4F8CFF"
+              opacity={activeSkill?.id === skill.id ? 0.4 : 0.25}
+              className="transition-opacity duration-300"
+            />
+            <circle
               r="3"
               fill="#4F8CFF"
               opacity={activeSkill?.id === skill.id ? 1 : 0.6}
-              filter="url(#node-glow)"
+              className="transition-opacity duration-300"
             />
             {/* label */}
             <text
@@ -382,14 +414,11 @@ export default function CoreExpertise() {
   const hasAnimated = useRef(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  const { ref: observerRef, isVisible } = useAnimeOnScroll<HTMLDivElement>({
-    threshold: 0.1,
-    rootMargin: '0px 0px -40px 0px',
+  const isVisible = useInView(sectionRef, {
+    amount: 0.1,
+    margin: '0px 0px -40px 0px',
+    once: true,
   });
-
-  const setRefs = (el: HTMLDivElement | null) => {
-    (observerRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-  };
 
   /* Responsive breakpoint */
   useEffect(() => {
@@ -406,42 +435,18 @@ export default function CoreExpertise() {
     const section = sectionRef.current;
     if (!section) return;
 
-    /* Title */
-    animate(section.querySelectorAll('.title-word'), {
-      opacity: [0, 1],
-      translateY: [30, 0],
-      filter: ['blur(6px)', 'blur(0px)'],
-      duration: 800,
-      ease: 'easeOutCubic',
-      delay: stagger(100, { start: 100 }),
-    });
+    const safeAnimate = (selector: string, keyframes: any, options: any) => {
+      const els = section.querySelectorAll(selector);
+      if (els.length > 0) animate(els, keyframes, options);
+    };
 
-    /* Subtitle */
-    animate(section.querySelectorAll('.section-sub'), {
-      opacity: [0, 1],
-      translateY: [16, 0],
-      duration: 700,
-      ease: 'easeOutCubic',
-      delay: 400,
-    });
+    safeAnimate('.title-word', { opacity: [0, 1], y: [30, 0] }, { duration: 0.8, ease: 'easeOut', delay: (i: number) => 0.1 + i * 0.1 });
 
-    /* Orbital / Cards */
-    animate(section.querySelectorAll('.orbital-wrapper'), {
-      opacity: [0, 1],
-      scale: [0.95, 1],
-      duration: 1000,
-      ease: 'easeOutCubic',
-      delay: 500,
-    });
+    safeAnimate('.section-sub', { opacity: [0, 1], y: [16, 0] }, { duration: 0.7, ease: 'easeOut', delay: 0.4 });
 
-    /* Mobile cards stagger */
-    animate(section.querySelectorAll('.skill-card'), {
-      opacity: [0, 1],
-      translateY: [24, 0],
-      duration: 600,
-      ease: 'easeOutCubic',
-      delay: stagger(80, { start: 400 }),
-    });
+    safeAnimate('.orbital-wrapper', { opacity: [0, 1], scale: [0.95, 1] }, { duration: 1.0, ease: 'easeOut', delay: 0.5 });
+
+    safeAnimate('.skill-card', { opacity: [0, 1], y: [24, 0] }, { duration: 0.6, ease: 'easeOut', delay: (i: number) => 0.4 + i * 0.08 });
   }, [isVisible]);
 
   const titleWords = ['Core', 'Expertise'];
@@ -457,17 +462,17 @@ export default function CoreExpertise() {
         aria-hidden="true"
       />
 
-      <div ref={setRefs} className="section-container relative z-10 flex flex-col items-center">
-        <div className="w-full max-w-5xl flex flex-col items-center text-center">
+      <div className="section-container relative z-10 flex flex-col items-center">
+        <div className="flex w-full max-w-5xl flex-col items-center text-center">
         {/* ── label ── */}
-        <p className="section-label mb-4 text-xs font-mono uppercase tracking-[0.25em] text-secondary opacity-0">
+        <p className="section-eyebrow section-label text-xs font-mono uppercase tracking-[0.2em] text-[#4F8CFF] opacity-0">
           <span className="mx-2 inline-block h-px w-6 bg-accent align-middle" />
           Skills &amp; Domains
           <span className="mx-2 inline-block h-px w-6 bg-accent align-middle" />
         </p>
 
         {/* ── title ── */}
-        <h2 className="mb-[24px] flex flex-wrap justify-center gap-x-4 text-[clamp(2.4rem,6vw,4.5rem)] font-bold leading-[0.95] tracking-tight text-white">
+        <h2 className="section-heading flex flex-wrap justify-center gap-x-4 text-[clamp(2.5rem,6vw,4.5rem)] font-bold leading-[1.05] tracking-tight text-white" data-cursor-text="Expertise" data-cursor-color="white">
           {titleWords.map((word, i) => (
             <span key={i} className="title-word inline-block opacity-0">
               {word}
@@ -476,7 +481,7 @@ export default function CoreExpertise() {
         </h2>
 
         {/* ── subtitle ── */}
-        <p className="section-sub mb-[64px] max-w-md mx-auto text-sm leading-relaxed text-secondary opacity-0 md:text-base text-center">
+        <p className="section-description section-sub text-base text-[#A0A0A0] font-light leading-relaxed opacity-0 text-center">
           An interconnected system of skills — click a node to explore.
         </p>
 

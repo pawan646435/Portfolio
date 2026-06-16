@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { animate, stagger } from 'animejs';
-import Button from '@/components/ui/Button';
+import { animate } from 'framer-motion';
 
 const SUBTITLES = [
   'Building advanced AI systems, premium full-stack products,',
@@ -22,43 +21,13 @@ export default function HeroContent() {
 
     const nameChars = container.querySelectorAll('.name-char');
     const subtitleLines = container.querySelectorAll('.subtitle-line');
-    const buttons = container.querySelectorAll('.hero-btn');
 
     // Stagger name characters
-    animate(nameChars, {
-      opacity: [0, 1],
-      translateY: [40, 0],
-      duration: 800,
-      ease: 'easeOutExpo',
-      delay: stagger(40, { start: 200 }),
-    });
+    animate(nameChars, { opacity: [0, 1], y: [30, 0] }, { duration: 0.6, ease: 'easeOut', delay: (i: number) => 0.05 + i * 0.02 });
 
     // Stagger subtitle lines
-    animate(subtitleLines, {
-      opacity: [0, 1],
-      translateY: [30, 0],
-      duration: 700,
-      ease: 'easeOutExpo',
-      delay: stagger(150, { start: 800 }),
-    });
-
-    // Animate buttons
-    animate(buttons, {
-      opacity: [0, 1],
-      translateY: [20, 0],
-      scale: [0.95, 1],
-      duration: 600,
-      ease: 'easeOutExpo',
-      delay: stagger(120, { start: 1300 }),
-    });
+    animate(subtitleLines, { opacity: [0, 1], y: [20, 0] }, { duration: 0.5, ease: 'easeOut', delay: (i: number) => 0.35 + i * 0.08 });
   }, []);
-
-  const handleScrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <div
@@ -67,7 +36,7 @@ export default function HeroContent() {
     >
       <div className="text-center px-6 max-w-4xl mx-auto">
         {/* Name */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter mb-[56px]">
+        <h1 className="mb-12 text-5xl font-bold tracking-tighter md:text-7xl lg:text-8xl">
           {'PAWAN KUMAR'.split('').map((char, i) => (
             <span
               key={i}
@@ -80,7 +49,7 @@ export default function HeroContent() {
         </h1>
 
         {/* Subtitle */}
-        <div className="max-w-3xl mx-auto space-y-3 md:space-y-4 mb-[72px]">
+        <div className="max-w-3xl mx-auto space-y-3 md:space-y-4 mb-0">
           {SUBTITLES.map((line, i) => (
             <p
               key={i}
@@ -89,53 +58,6 @@ export default function HeroContent() {
               {line}
             </p>
           ))}
-        </div>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-[16px] sm:gap-[24px]">
-          <div className="hero-btn opacity-0">
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => handleScrollTo('projects')}
-            >
-              <span>Explore Projects</span>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                className="ml-1"
-              >
-                <path
-                  d="M6 3L11 8L6 13"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Button>
-          </div>
-          <div className="hero-btn opacity-0">
-            <Button
-              variant="secondary"
-              size="lg"
-              href="/resume"
-              target="_blank"
-            >
-              View Resume
-            </Button>
-          </div>
-          <div className="hero-btn opacity-0">
-            <Button
-              variant="ghost"
-              size="lg"
-              onClick={() => handleScrollTo('contact')}
-            >
-              Contact
-            </Button>
-          </div>
         </div>
       </div>
     </div>

@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { animate, stagger } from 'animejs';
-import { useAnimeOnScroll } from '@/hooks/useAnimeOnScroll';
+import { animate, useInView } from 'framer-motion';
 
 /* ─── Decorative: floating dot grid ─── */
 function DotGrid() {
@@ -45,7 +44,7 @@ function RoleSegment({ label, index }: RoleSegmentProps) {
       {index > 0 && (
         <span className="role-divider mx-3 block h-4 w-px bg-white/20 opacity-0 md:mx-4" />
       )}
-      <span className="role-segment block opacity-0">
+      <span className="role-segment block opacity-0 cursor-default" data-cursor-text={label} data-cursor-color="white">
         {label}
       </span>
     </div>
@@ -57,15 +56,11 @@ export default function WhoIAm() {
   const sectionRef = useRef<HTMLElement>(null);
   const hasAnimated = useRef(false);
 
-  const { ref: observerRef, isVisible } = useAnimeOnScroll<HTMLDivElement>({
-    threshold: 0.15,
-    rootMargin: '0px 0px -60px 0px',
+  const isVisible = useInView(sectionRef, {
+    amount: 0.15,
+    margin: '0px 0px -60px 0px',
+    once: true,
   });
-
-  /* merge refs */
-  const setRefs = (el: HTMLDivElement | null) => {
-    (observerRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-  };
 
   /* ── animations ── */
   useEffect(() => {
@@ -76,75 +71,28 @@ export default function WhoIAm() {
     if (!section) return;
 
     /* 1. Label tag */
-    animate(section.querySelectorAll('.section-label'), {
-      opacity: [0, 1],
-      translateY: [12, 0],
-      duration: 600,
-      ease: 'easeOutCubic',
-    });
+    animate(section.querySelectorAll('.section-label'), { opacity: [0, 1], y: [12, 0] }, { duration: 0.6, ease: 'easeOut' });
 
     /* 2. Name – word by word */
-    animate(section.querySelectorAll('.name-word'), {
-      opacity: [0, 1],
-      translateY: [40, 0],
-      filter: ['blur(8px)', 'blur(0px)'],
-      duration: 800,
-      ease: 'easeOutCubic',
-      delay: stagger(120, { start: 200 }),
-    });
+    animate(section.querySelectorAll('.name-word'), { opacity: [0, 1], y: [40, 0] }, { duration: 0.8, ease: 'easeOut', delay: (i) => 0.2 + i * 0.12 });
 
     /* 3. Accent line below name */
-    animate(section.querySelectorAll('.hero-line'), {
-      scaleX: [0, 1],
-      opacity: [0, 1],
-      duration: 900,
-      ease: 'easeInOutQuart',
-      delay: 600,
-    });
+    animate(section.querySelectorAll('.hero-line'), { scaleX: [0, 1], opacity: [0, 1] }, { duration: 0.9, ease: [0.77, 0, 0.175, 1], delay: 0.6 });
 
     /* 4. Role segments – independent stagger */
-    animate(section.querySelectorAll('.role-segment'), {
-      opacity: [0, 1],
-      translateY: [20, 0],
-      duration: 700,
-      ease: 'easeOutCubic',
-      delay: stagger(180, { start: 700 }),
-    });
+    animate(section.querySelectorAll('.role-segment'), { opacity: [0, 1], y: [20, 0] }, { duration: 0.7, ease: 'easeOut', delay: (i) => 0.7 + i * 0.18 });
 
     /* 5. Role dividers */
-    animate(section.querySelectorAll('.role-divider'), {
-      opacity: [0, 0.2],
-      scaleY: [0, 1],
-      duration: 500,
-      ease: 'easeOutCubic',
-      delay: stagger(180, { start: 900 }),
-    });
+    animate(section.querySelectorAll('.role-divider'), { opacity: [0, 0.2], scaleY: [0, 1] }, { duration: 0.5, ease: 'easeOut', delay: (i) => 0.9 + i * 0.18 });
 
     /* 6. Education card */
-    animate(section.querySelectorAll('.edu-card'), {
-      opacity: [0, 1],
-      translateY: [32, 0],
-      duration: 800,
-      ease: 'easeOutCubic',
-      delay: 1200,
-    });
+    animate(section.querySelectorAll('.edu-card'), { opacity: [0, 1], y: [32, 0] }, { duration: 0.8, ease: 'easeOut', delay: 1.2 });
 
     /* 7. Meta chips */
-    animate(section.querySelectorAll('.meta-chip'), {
-      opacity: [0, 1],
-      scale: [0.85, 1],
-      duration: 600,
-      ease: 'easeOutCubic',
-      delay: stagger(100, { start: 1500 }),
-    });
+    animate(section.querySelectorAll('.meta-chip'), { opacity: [0, 1], scale: [0.85, 1] }, { duration: 0.6, ease: 'easeOut', delay: (i) => 1.5 + i * 0.1 });
 
     /* 8. Decorative dot grid */
-    animate(section.querySelectorAll('.dot-grid-wrapper'), {
-      opacity: [0, 1],
-      duration: 1200,
-      ease: 'easeOutCubic',
-      delay: 800,
-    });
+    animate(section.querySelectorAll('.dot-grid-wrapper'), { opacity: [0, 1] }, { duration: 1.2, ease: 'easeOut', delay: 0.8 });
   }, [isVisible]);
 
   const nameWords = ['Pawan', 'Kumar'];
@@ -161,17 +109,17 @@ export default function WhoIAm() {
         aria-hidden="true"
       />
 
-      <div ref={setRefs} className="section-container relative z-10 flex flex-col items-center">
-        <div className="w-full max-w-5xl flex flex-col items-center text-center">
+      <div className="section-container relative z-10 flex flex-col items-center">
+        <div className="flex w-full max-w-5xl flex-col items-center text-center">
         {/* ── tiny label ── */}
-        <p className="section-label mb-6 text-xs font-mono uppercase tracking-[0.25em] text-secondary opacity-0">
+        <p className="section-eyebrow section-label flex items-center justify-center text-xs font-mono uppercase tracking-[0.2em] text-[#4F8CFF] opacity-0">
           <span className="mx-2 inline-block h-px w-6 bg-accent align-middle" />
           Who I Am
           <span className="mx-2 inline-block h-px w-6 bg-accent align-middle" />
         </p>
 
         {/* ── name heading ── */}
-        <h2 className="mb-[8px] flex flex-wrap justify-center gap-x-4 text-[clamp(2.8rem,8vw,6rem)] font-bold leading-[0.95] tracking-tight text-white">
+        <h2 className="mb-4 flex flex-wrap justify-center gap-x-4 text-[clamp(2.8rem,8vw,5rem)] font-bold leading-[1.05] tracking-tight text-white" data-cursor-text="Pawan Kumar" data-cursor-color="white">
           {nameWords.map((word, i) => (
             <span
               key={i}
@@ -184,21 +132,14 @@ export default function WhoIAm() {
 
         {/* ── gradient line below name ── */}
         <div
-          className="hero-line mb-[24px] h-px w-32 origin-center scale-x-0 bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 md:w-48"
+          className="hero-line mb-6 h-px w-32 origin-center scale-x-0 bg-gradient-to-r from-transparent via-accent to-transparent opacity-0 md:w-48"
           aria-hidden="true"
         />
 
         {/* ── role segments ── */}
-        <div className="mb-[64px] flex flex-wrap items-center justify-center gap-y-2 text-base font-light text-secondary md:text-lg lg:text-xl">
+        <div className="mb-12 flex flex-wrap items-center justify-center gap-y-2 text-base font-light text-secondary md:text-lg lg:text-xl">
           {roles.map((role, i) => (
-            <div key={role} className="flex items-center">
-              {i > 0 && (
-                <span className="mx-3 block h-4 w-px bg-white/20 md:mx-4 shrink-0" />
-              )}
-              <span className="role-segment block opacity-0">
-                {role}
-              </span>
-            </div>
+            <RoleSegment key={role} label={role} index={i} />
           ))}
         </div>
 
@@ -245,7 +186,7 @@ export default function WhoIAm() {
         </div>
 
         {/* ── bottom accent line ── */}
-        <AccentLine className="mt-10 md:mt-12 lg:mt-14 w-full" />
+        <AccentLine className="mt-8 w-full md:mt-12" />
         </div>
       </div>
 

@@ -28,19 +28,8 @@ Vercel will automatically detect that this is a **Next.js** application. Keep th
 - **Root Directory**: `./` (default)
 - **Build & Development Settings**: Keep defaults (Vercel will run `next build` automatically).
 
-### Step 4: Configure Environment Variables 🔑
-Your portfolio uses a custom endpoint to fetch GitHub profile stats and repositories. To prevent GitHub API rate limits, configure the `GITHUB_TOKEN` variable:
-
-1. Go to your **GitHub Settings** → **Developer Settings** → **Personal Access Tokens** → **Tokens (classic)**.
-2. Generate a new token (no scopes or permissions are required, it just needs to be an active read-only token to authorize public API requests).
-3. Copy the token.
-4. Back in the Vercel setup, expand the **"Environment Variables"** section.
-5. Add the following entry:
-   - **Key**: `GITHUB_TOKEN`
-   - **Value**: *[Paste your GitHub Personal Access Token]*
-6. Click **"Add"**.
-
-*(Note: Adding `GITHUB_TOKEN` is optional but highly recommended to avoid API limits when visitors browse your portfolio).*
+### Step 4: Configure Environment Variables
+This portfolio does not require any environment variables to run. Simply proceed with the default settings.
 
 ### Step 5: Deploy! 🎉
 1. Click the **"Deploy"** button.

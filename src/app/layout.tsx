@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import LenisProvider from "@/components/LenisProvider";
+import RootLayoutClient from "@/components/RootLayoutClient";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +44,7 @@ export const metadata: Metadata = {
     description:
       "Building AI Systems, Full-Stack Products, and Intelligent Automations.",
   },
+  icons: [{ rel: 'icon', url: '/favicon.svg', type: 'image/svg+xml' }],
   robots: {
     index: true,
     follow: true,
@@ -56,13 +57,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    <RootLayoutClient
+      geistSansVar={geistSans.variable}
+      geistMonoVar={geistMono.variable}
     >
-      <body className="noise-overlay">
-        <LenisProvider>{children}</LenisProvider>
-      </body>
-    </html>
+      {children}
+    </RootLayoutClient>
   );
 }
