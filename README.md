@@ -3,6 +3,8 @@
 A premium, immersive portfolio experience inspired by Renaissance art and the
 Italian codex tradition. Built with Next.js, Three.js, and Framer Motion.
 
+**Live:** [portfolio-indol-chi-66.vercel.app](https://portfolio-indol-chi-66.vercel.app)
+
 ## Experience
 
 - **Cinematic Entry Gate** — enter the codex with a conscious choice
@@ -75,13 +77,9 @@ recordings such as Erik Satie's Gymnopédies.
 
 ## Deployment
 
-Deployed on Vercel. Connect the GitHub repo and deploy:
+Deployed on Vercel: [portfolio-indol-chi-66.vercel.app](https://portfolio-indol-chi-66.vercel.app)
 
-1. Push to GitHub
-2. Import the repo on vercel.com
-3. Framework: Next.js (auto-detected)
-4. Build command: `npm run build` (auto)
-5. Deploy
+Connected to the GitHub repo — every push to `main` redeploys automatically.
 
 ## Contact
 
