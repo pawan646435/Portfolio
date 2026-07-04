@@ -9,11 +9,14 @@ import { useApp } from "@/lib/context/AppContext";
 import { spotlight } from "@/lib/spotlight";
 import { useMediaQuery, useReducedMotion } from "@/lib/hooks";
 import Typewriter from "@/components/ui/Typewriter";
-import ParticlesBackground from "@/components/ui/ParticlesBackground";
 
 const GoldenSpiral = dynamic(() => import("@/components/3d/GoldenSpiral"), {
   ssr: false,
 });
+const ParticlesBackground = dynamic(
+  () => import("@/components/ui/ParticlesBackground"),
+  { ssr: false }
+);
 
 const LETTER_RADIUS = 120;
 
@@ -64,8 +67,8 @@ function IlluminatedName() {
       ref={containerRef}
       className="font-space-grotesk font-bold"
       style={{
-        fontSize: "clamp(2.8rem, 7vw, 7rem)",
-        letterSpacing: "0.08em",
+        fontSize: "clamp(4rem, 8vw, 8rem)",
+        letterSpacing: "0.1em",
         lineHeight: 1.05,
       }}
       aria-label={profile.name}
@@ -102,36 +105,51 @@ export default function RoomIdentity() {
   }, [hasEntered]);
 
   return (
-    <div className="relative w-full h-full flex items-center">
+    <div className="relative w-full h-full">
       <ParticlesBackground />
+
+      {/* Golden spiral — full-room background, like an illuminated manuscript's decorative geometry */}
+      <div
+        className="hidden md:block absolute inset-0 z-1 pointer-events-none"
+        style={{ opacity: 0.7 }}
+        data-reveal
+        data-reveal-base="0.55"
+        data-reveal-max="0.85"
+        data-reveal-radius="500"
+      >
+        <GoldenSpiral className="w-full h-full" />
+      </div>
 
       {/* Light pooling at the gallery floor */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-50 pointer-events-none"
+        className="absolute bottom-0 left-0 right-0 h-50 pointer-events-none z-2"
         style={{
           background: "linear-gradient(to top, rgba(201,168,76,0.03), transparent)",
         }}
         aria-hidden="true"
       />
 
-      {/* Eyebrow */}
-      <span
-        className="absolute font-jetbrains-mono"
-        style={{
-          top: "15%",
-          left: "8%",
-          fontSize: "0.7rem",
-          letterSpacing: "0.2em",
-          color: "rgba(201,168,76,0.4)",
-        }}
+      {/* Content — centered inscription over the spiral */}
+      <div
+        className="relative z-10 w-full h-full flex flex-col items-center justify-center text-center mx-auto"
+        style={{ maxWidth: 800, padding: "0 40px" }}
         data-reveal
-        data-reveal-base="0.2"
+        data-reveal-base="0.15"
+        data-reveal-max="1"
+        data-reveal-radius="300"
       >
-        &lt; Codex I &gt;
-      </span>
+        {/* Eyebrow */}
+        <span
+          className="font-jetbrains-mono"
+          style={{
+            fontSize: "0.7rem",
+            letterSpacing: "0.2em",
+            color: "rgba(201,168,76,0.4)",
+          }}
+        >
+          &lt; Codex I &gt;
+        </span>
 
-      {/* Left zone — text */}
-      <div className="w-full md:w-[55%] px-[8%] z-10">
         <IlluminatedName />
 
         <div className="mt-6 min-h-10">
@@ -147,12 +165,13 @@ export default function RoomIdentity() {
           initial={{ opacity: 0, y: 10 }}
           animate={showTagline ? { opacity: 0.7, y: 0 } : {}}
           transition={{ duration: 1, delay: 1.5 }}
-          className="font-inter text-[0.9rem] leading-[1.8] max-w-105 mt-6 text-text-muted"
+          className="font-inter text-[0.9rem] leading-[1.8] mt-6 text-text-muted mx-auto"
+          style={{ maxWidth: 520 }}
         >
           {profile.bio}
         </motion.p>
 
-        <div className="flex flex-wrap items-center gap-8 mt-10" data-reveal data-reveal-base="0.25">
+        <div className="flex flex-row flex-wrap items-center justify-center gap-8 mt-10">
           <button className="codex-cta" onClick={() => setCurrentRoom(2)}>
             View My Work
           </button>
@@ -167,7 +186,7 @@ export default function RoomIdentity() {
         </div>
 
         {/* Socials */}
-        <div className="absolute bottom-[10%] left-[8%] flex items-center gap-5">
+        <div className="flex items-center justify-center gap-6 mt-6">
           {[
             { href: profile.github, icon: <FiGithub />, label: "GitHub" },
             { href: profile.linkedin, icon: <FiLinkedin />, label: "LinkedIn" },
@@ -186,16 +205,6 @@ export default function RoomIdentity() {
             </a>
           ))}
         </div>
-      </div>
-
-      {/* Right zone — sacred globe, emerging from darkness */}
-      <div
-        className="hidden md:block w-[45%] h-full"
-        data-reveal
-        data-reveal-base="0.3"
-        data-reveal-radius="450"
-      >
-        <GoldenSpiral className="w-full h-full" />
       </div>
     </div>
   );

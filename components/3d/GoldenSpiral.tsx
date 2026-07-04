@@ -3,26 +3,26 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Line } from "@react-three/drei";
 import { useEffect, useMemo, useRef } from "react";
-import * as THREE from "three";
+import { Color, Vector3, EdgesGeometry, PlaneGeometry, type Group, type Mesh, type MeshStandardMaterial } from "three";
 import { useReducedMotion } from "@/lib/hooks";
 
 const PHI = 1.618033988749;
 const B = Math.log(PHI) / (Math.PI / 2);
 
-const COLOR_INNER = new THREE.Color("#6B6355");
-const COLOR_MID = new THREE.Color("#C9A84C");
-const COLOR_OUTER = new THREE.Color("#FFD700");
+const COLOR_INNER = new Color("#6B6355");
+const COLOR_MID = new Color("#C9A84C");
+const COLOR_OUTER = new Color("#FFD700");
 
 /** Point on the golden spiral r = a·e^(bθ) at parameter t (in radians), tilted slightly in z. */
 function spiralPoint(t: number, totalT: number, radiusScale: number) {
   const r = radiusScale * Math.pow(Math.E, B * t);
-  return new THREE.Vector3(r * Math.cos(t), r * Math.sin(t), (t / totalT) * 0.4 - 0.2);
+  return new Vector3(r * Math.cos(t), r * Math.sin(t), (t / totalT) * 0.4 - 0.2);
 }
 
 function useSpiralPoints(totalTurns: number, steps: number, radiusScale = 0.15) {
   return useMemo(() => {
     const totalT = totalTurns * Math.PI * 2;
-    const points: THREE.Vector3[] = [];
+    const points: Vector3[] = [];
     for (let i = 0; i <= steps; i++) {
       points.push(spiralPoint((i / steps) * totalT, totalT, radiusScale));
     }
@@ -32,10 +32,10 @@ function useSpiralPoints(totalTurns: number, steps: number, radiusScale = 0.15) 
 
 function useGradientColors(count: number) {
   return useMemo(() => {
-    const colors: THREE.Color[] = [];
+    const colors: Color[] = [];
     for (let i = 0; i < count; i++) {
       const t = i / (count - 1);
-      const c = new THREE.Color();
+      const c = new Color();
       if (t < 0.5) c.lerpColors(COLOR_INNER, COLOR_MID, t * 2);
       else c.lerpColors(COLOR_MID, COLOR_OUTER, (t - 0.5) * 2);
       colors.push(c);
@@ -46,7 +46,7 @@ function useGradientColors(count: number) {
 
 function FibonacciDots({ totalTurns, radiusScale }: { totalTurns: number; radiusScale: number }) {
   const reducedMotion = useReducedMotion();
-  const materials = useRef<(THREE.MeshStandardMaterial | null)[]>([]);
+  const materials = useRef<(MeshStandardMaterial | null)[]>([]);
   const totalT = totalTurns * Math.PI * 2;
 
   const dots = useMemo(() => {
@@ -61,7 +61,7 @@ function FibonacciDots({ totalTurns, radiusScale }: { totalTurns: number; radius
     const t = clock.getElapsedTime();
     materials.current.forEach((mat, i) => {
       if (!mat) return;
-      mat.emissiveIntensity = reducedMotion ? 0.4 : 0.3 + Math.sin(t * 1.2 + i * 0.8) * 0.3;
+      mat.emissiveIntensity = reducedMotion ? 0.4 : 0.2 + Math.sin(t * 1.2 + i * 0.8) * 0.2;
     });
   });
 
@@ -85,13 +85,13 @@ function FibonacciDots({ totalTurns, radiusScale }: { totalTurns: number; radius
 }
 
 const GOLDEN_RECTANGLES = [
-  { w: 1.0, h: 0.618, z: -0.5, opacity: 0.15 },
-  { w: 1.618, h: 1.0, z: -0.8, opacity: 0.08 },
-  { w: 2.618, h: 1.618, z: -1.2, opacity: 0.04 },
+  { w: 1.0, h: 0.618, z: -0.5, opacity: 0.06 },
+  { w: 1.618, h: 1.0, z: -0.8, opacity: 0.03 },
+  { w: 2.618, h: 1.618, z: -1.2, opacity: 0.015 },
 ];
 
 function GoldenRectangles() {
-  const groupRef = useRef<THREE.Group>(null);
+  const groupRef = useRef<Group>(null);
   const reducedMotion = useReducedMotion();
 
   useFrame(() => {
@@ -100,7 +100,7 @@ function GoldenRectangles() {
   });
 
   const edges = useMemo(
-    () => GOLDEN_RECTANGLES.map((r) => new THREE.EdgesGeometry(new THREE.PlaneGeometry(r.w, r.h))),
+    () => GOLDEN_RECTANGLES.map((r) => new EdgesGeometry(new PlaneGeometry(r.w, r.h))),
     []
   );
 
@@ -116,7 +116,7 @@ function GoldenRectangles() {
 }
 
 function MeasurementArc() {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const meshRef = useRef<Mesh>(null);
   const reducedMotion = useReducedMotion();
 
   useFrame(() => {
@@ -133,7 +133,7 @@ function MeasurementArc() {
 }
 
 function SpiralGroup({ interactive }: { interactive: boolean }) {
-  const groupRef = useRef<THREE.Group>(null);
+  const groupRef = useRef<Group>(null);
   const reducedMotion = useReducedMotion();
   const { size } = useThree();
   const isDesktop = interactive && size.width > 768;
@@ -165,9 +165,9 @@ function SpiralGroup({ interactive }: { interactive: boolean }) {
       group.rotation.x += 0.0004;
       group.rotation.y += 0.0006;
       const breathe = Math.sin(clock.getElapsedTime() * 0.4);
-      group.scale.setScalar(1.8 + breathe * 0.04);
+      group.scale.setScalar(2.6 + breathe * 0.04);
     } else {
-      group.scale.setScalar(1.8);
+      group.scale.setScalar(2.6);
     }
 
     if (isDesktop) {
@@ -182,9 +182,9 @@ function SpiralGroup({ interactive }: { interactive: boolean }) {
     <>
       <group ref={groupRef}>
         <group scale={1.02}>
-          <Line points={points} color="#C9A84C" transparent opacity={0.08} lineWidth={1.5} />
+          <Line points={points} color="#C9A84C" transparent opacity={0.05} lineWidth={1.5} />
         </group>
-        <Line points={points} vertexColors={colors} transparent lineWidth={1.5} />
+        <Line points={points} vertexColors={colors} transparent opacity={0.45} lineWidth={1.5} />
         <FibonacciDots totalTurns={totalTurns} radiusScale={0.15} />
       </group>
       <GoldenRectangles />
@@ -214,7 +214,7 @@ export default function GoldenSpiral({
         φ
       </span>
       <Canvas
-        camera={{ position: [0, 0, 5], fov: 45 }}
+        camera={{ position: [0, 0, 7], fov: 55 }}
         dpr={[1, 2]}
         performance={{ min: 0.5 }}
         frameloop="always"

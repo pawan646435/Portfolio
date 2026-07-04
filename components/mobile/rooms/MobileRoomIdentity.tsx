@@ -38,146 +38,150 @@ export default function MobileRoomIdentity() {
   let letterIndex = 0;
 
   return (
-    <div
-      className="relative z-10 flex flex-col items-center justify-center text-center h-full"
-      style={{ padding: "0 28px" }}
-    >
-      {/* Glow behind the name */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse 90% 60% at 50% 35%, rgba(201,168,76,0.05), transparent 65%)",
-        }}
-        aria-hidden="true"
-      />
-
-      <motion.p
-        className="font-jetbrains-mono"
-        style={{
-          fontSize: "0.6rem",
-          letterSpacing: "0.2em",
-          color: "rgba(201,168,76,0.35)",
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-      >
-        &lt; Codex I — Identity &gt;
-      </motion.p>
-
-      {/* Staggered letters */}
-      <h1
-        className="font-space-grotesk font-bold mt-4"
-        style={{
-          fontSize: "clamp(2.6rem, 9vw, 4rem)",
-          letterSpacing: "0.06em",
-          lineHeight: 1.1,
-        }}
-        aria-label={profile.name}
-      >
-        {words.map((word, w) => (
-          <span key={w} className="block whitespace-nowrap" aria-hidden="true">
-            {word.split("").map((ch, i) => {
-              const delay = 0.5 + letterIndex++ * 0.05;
-              return (
-                <motion.span
-                  key={i}
-                  className="mobile-name-letter"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay, ease: "easeOut" }}
-                >
-                  {ch}
-                </motion.span>
-              );
-            })}
-          </span>
-        ))}
-      </h1>
-
-      <div className="mt-4 min-h-8">
-        {showTagline && <Typewriter words={profile.taglines} />}
-      </div>
-
-      <motion.p
-        className="font-inter mt-4"
-        style={{
-          fontSize: "0.82rem",
-          lineHeight: 1.85,
-          color: "#6B6355",
-          maxWidth: 300,
-        }}
-        initial={{ opacity: 0, y: 10 }}
-        animate={showTagline ? { opacity: 0.75, y: 0 } : {}}
-        transition={{ duration: 0.8, delay: 0.5 }}
-      >
-        {profile.bio}
-      </motion.p>
-
+    <div className="relative h-full">
+      {/* Golden spiral — full background */}
       <motion.div
+        className="absolute inset-0 pointer-events-none"
+        style={{ opacity: 0.5 }}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 2.2 }}
-        style={{ margin: "16px auto" }}
+        animate={{ opacity: 0.5 }}
+        transition={{ duration: 1.5, delay: 0.8 }}
       >
-        <MobileSpiral size={160} />
+        <MobileSpiral fill />
       </motion.div>
 
-      <motion.div
-        className="flex flex-col items-center gap-2.5 w-full"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 2.6 }}
+      <div
+        className="relative z-10 flex flex-col items-center justify-center text-center h-full"
+        style={{ padding: "0 24px" }}
       >
-        <button
-          className="mobile-cta"
-          onClick={() =>
-            window.dispatchEvent(new CustomEvent(MOBILE_NAV_EVENT, { detail: 2 }))
-          }
-        >
-          View My Work
-        </button>
-        <a
-          className="mobile-cta"
-          href="/resume.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Download Resume
-        </a>
+        {/* Glow behind the name */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 90% 60% at 50% 35%, rgba(201,168,76,0.05), transparent 65%)",
+          }}
+          aria-hidden="true"
+        />
 
-        <div className="flex items-center justify-center gap-6 mt-3">
-          {SOCIALS.map(({ href, icon, label }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={label}
-              className="flex items-center justify-center active:scale-115 transition-transform"
-              style={{
-                fontSize: 20,
-                color: "rgba(201,168,76,0.4)",
-                minWidth: 44,
-                minHeight: 44,
-              }}
-            >
-              {icon}
-            </a>
+        <motion.p
+          className="font-jetbrains-mono"
+          style={{
+            fontSize: "0.6rem",
+            letterSpacing: "0.2em",
+            color: "rgba(201,168,76,0.35)",
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          &lt; Codex I — Identity &gt;
+        </motion.p>
+
+        {/* Staggered letters */}
+        <h1
+          className="font-space-grotesk font-bold mt-4"
+          style={{
+            fontSize: "clamp(2.6rem, 9vw, 4rem)",
+            letterSpacing: "0.06em",
+            lineHeight: 1.1,
+          }}
+          aria-label={profile.name}
+        >
+          {words.map((word, w) => (
+            <span key={w} className="block whitespace-nowrap" aria-hidden="true">
+              {word.split("").map((ch, i) => {
+                const delay = 0.5 + letterIndex++ * 0.05;
+                return (
+                  <motion.span
+                    key={i}
+                    className="mobile-name-letter"
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay, ease: "easeOut" }}
+                  >
+                    {ch}
+                  </motion.span>
+                );
+              })}
+            </span>
           ))}
+        </h1>
+
+        <div className="mt-4 min-h-8">
+          {showTagline && <Typewriter words={profile.taglines} />}
         </div>
 
-        {!scrolled && (
-          <span
-            className="mobile-scroll-hint font-jetbrains-mono mt-1"
-            style={{ fontSize: "0.6rem", color: "rgba(201,168,76,0.2)" }}
-            aria-hidden="true"
+        <motion.p
+          className="font-inter mt-4"
+          style={{
+            fontSize: "0.82rem",
+            lineHeight: 1.85,
+            color: "#6B6355",
+            maxWidth: 300,
+          }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={showTagline ? { opacity: 0.75, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          {profile.bio}
+        </motion.p>
+
+        <motion.div
+          className="flex flex-col items-center gap-2.5 w-full"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 2.6 }}
+        >
+          <button
+            className="mobile-cta"
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent(MOBILE_NAV_EVENT, { detail: 2 }))
+            }
           >
-            scroll ↓
-          </span>
-        )}
-      </motion.div>
+            View My Work
+          </button>
+          <a
+            className="mobile-cta"
+            href="/resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Download Resume
+          </a>
+
+          <div className="flex items-center justify-center gap-6 mt-3">
+            {SOCIALS.map(({ href, icon, label }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="flex items-center justify-center active:scale-115 transition-transform"
+                style={{
+                  fontSize: 20,
+                  color: "rgba(201,168,76,0.4)",
+                  minWidth: 44,
+                  minHeight: 44,
+                }}
+              >
+                {icon}
+              </a>
+            ))}
+          </div>
+
+          {!scrolled && (
+            <span
+              className="mobile-scroll-hint font-jetbrains-mono mt-1"
+              style={{ fontSize: "0.6rem", color: "rgba(201,168,76,0.2)" }}
+              aria-hidden="true"
+            >
+              scroll ↓
+            </span>
+          )}
+        </motion.div>
+      </div>
     </div>
   );
 }

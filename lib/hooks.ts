@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
@@ -56,4 +56,21 @@ export function useMediaQuery(query: string) {
     () => window.matchMedia(query).matches,
     () => false
   );
+}
+
+const ROOM_IMPORTS = [
+  () => import("@/components/rooms/RoomIdentity"),
+  () => import("@/components/rooms/RoomStory"),
+  () => import("@/components/rooms/RoomWorks"),
+  () => import("@/components/rooms/RoomArsenal"),
+  () => import("@/components/rooms/RoomDialogue"),
+];
+
+/** Warms the chunk cache for the current room and its immediate neighbours. */
+export function useRoomPreloader(currentRoom: number) {
+  useEffect(() => {
+    for (const i of [currentRoom - 1, currentRoom, currentRoom + 1]) {
+      ROOM_IMPORTS[i]?.();
+    }
+  }, [currentRoom]);
 }

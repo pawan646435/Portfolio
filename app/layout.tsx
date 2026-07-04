@@ -2,31 +2,42 @@ import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import AppProviders from "@/components/ui/AppProviders";
-import CustomCursor from "@/components/ui/CustomCursor";
 
+// Critical — used on the entry gate, preloaded so it's ready for first paint.
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: "swap",
+  preload: true,
 });
 
+// Non-critical — only used inside rooms, entered after the gate.
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
+  display: "swap",
+  preload: false,
 });
 
+// Non-critical — only used inside rooms, entered after the gate.
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   weight: ["400", "500"],
+  display: "swap",
+  preload: false,
 });
 
+// Critical — used on the entry gate, preloaded so it's ready for first paint.
 const cormorantGaramond = Cormorant_Garamond({
   variable: "--font-cormorant",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   style: ["normal", "italic"],
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -60,7 +71,6 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <div className="parchment-overlay" aria-hidden="true" />
-        <CustomCursor />
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

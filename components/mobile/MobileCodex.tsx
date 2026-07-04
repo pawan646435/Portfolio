@@ -1,13 +1,32 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import MobileEntryGate from "@/components/mobile/MobileEntryGate";
 import MobileLayout from "@/components/mobile/MobileLayout";
-import MobileAudio from "@/components/mobile/MobileAudio";
-import MobileRoomIdentity from "@/components/mobile/rooms/MobileRoomIdentity";
-import MobileRoomStory from "@/components/mobile/rooms/MobileRoomStory";
-import MobileRoomWorks from "@/components/mobile/rooms/MobileRoomWorks";
-import MobileRoomArsenal from "@/components/mobile/rooms/MobileRoomArsenal";
-import MobileRoomDialogue from "@/components/mobile/rooms/MobileRoomDialogue";
+
+const MobileAudio = dynamic(() => import("@/components/mobile/MobileAudio"), {
+  ssr: false,
+});
+const MobileRoomIdentity = dynamic(
+  () => import("@/components/mobile/rooms/MobileRoomIdentity"),
+  { ssr: false }
+);
+const MobileRoomStory = dynamic(
+  () => import("@/components/mobile/rooms/MobileRoomStory"),
+  { ssr: false }
+);
+const MobileRoomWorks = dynamic(
+  () => import("@/components/mobile/rooms/MobileRoomWorks"),
+  { ssr: false }
+);
+const MobileRoomArsenal = dynamic(
+  () => import("@/components/mobile/rooms/MobileRoomArsenal"),
+  { ssr: false }
+);
+const MobileRoomDialogue = dynamic(
+  () => import("@/components/mobile/rooms/MobileRoomDialogue"),
+  { ssr: false }
+);
 
 /**
  * The mobile codex — a vertical, page-by-page reading of the portfolio.

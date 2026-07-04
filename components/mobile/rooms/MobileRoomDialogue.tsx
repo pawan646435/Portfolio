@@ -1,9 +1,15 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { profile } from "@/lib/data";
 import RenaissanceDivider from "@/components/ui/RenaissanceDivider";
 import CodexSeal from "@/components/mobile/CodexSeal";
+
+const GoldenSpiralMini = dynamic(() => import("@/components/3d/GoldenSpiralMini"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const CONTACTS = [
   { prefix: "✉", label: "Send an Email", href: `mailto:${profile.email}` },
@@ -17,6 +23,24 @@ export default function MobileRoomDialogue() {
       className="relative z-10 flex flex-col items-center justify-center text-center h-full"
       style={{ padding: "40px 28px 28px" }}
     >
+      {/* Golden spiral — full background, dim ghost of Room I's spiral */}
+      <div className="absolute inset-0 pointer-events-none z-0" style={{ opacity: 0.35 }}>
+        <GoldenSpiralMini
+          className="w-full h-full"
+          scale={1.8}
+          rotationSpeed={{ x: 0.0002, y: 0, z: 0.0008 }}
+          breatheAmplitude={0.03}
+          opacity={0.3}
+          cameraPosition={[0, 0, 6]}
+          fov={50}
+          dpr={[1, 1]}
+          pointLightIntensity={0.5}
+          ambientLightIntensity={0.1}
+          ambientColor="#C9A84C"
+          gl={{ powerPreference: "low-power", antialias: false, alpha: true }}
+        />
+      </div>
+
       {/* Warm glow rising from the floor */}
       <div
         className="absolute inset-0 pointer-events-none"

@@ -10,6 +10,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { rooms } from "@/lib/data";
 import { ROOM_COUNT, ROOM_TRANSITION_MS, useApp } from "@/lib/context/AppContext";
+import { useRoomPreloader } from "@/lib/hooks";
 
 const NAV_THROTTLE_MS = 1200;
 const SWIPE_THRESHOLD_PX = 50;
@@ -26,6 +27,8 @@ export default function RoomEngine({ children }: { children: ReactNode[] }) {
   const [sweepDir, setSweepDir] = useState<"left" | "right" | null>(null);
   const [showKeys, setShowKeys] = useState(true);
   const keysTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useRoomPreloader(currentRoom);
 
   const navigate = useCallback(
     (target: number) => {

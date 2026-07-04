@@ -1,17 +1,36 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import EntryGate from "@/components/gates/EntryGate";
 import RoomEngine from "@/components/ui/RoomEngine";
-import SpotlightCursor from "@/components/ui/SpotlightCursor";
-import AmbientAudio from "@/components/ui/AmbientAudio";
 import ShortcutsOverlay from "@/components/ui/ShortcutsOverlay";
-import RoomIdentity from "@/components/rooms/RoomIdentity";
-import RoomStory from "@/components/rooms/RoomStory";
-import RoomWorks from "@/components/rooms/RoomWorks";
-import RoomArsenal from "@/components/rooms/RoomArsenal";
-import RoomDialogue from "@/components/rooms/RoomDialogue";
-import MobileCodex from "@/components/mobile/MobileCodex";
 import { useDevice } from "@/lib/hooks";
+
+const SpotlightCursor = dynamic(() => import("@/components/ui/SpotlightCursor"), {
+  ssr: false,
+});
+const AmbientAudio = dynamic(() => import("@/components/ui/AmbientAudio"), {
+  ssr: false,
+});
+const MobileCodex = dynamic(() => import("@/components/mobile/MobileCodex"), {
+  ssr: false,
+});
+
+const RoomIdentity = dynamic(() => import("@/components/rooms/RoomIdentity"), {
+  ssr: false,
+});
+const RoomStory = dynamic(() => import("@/components/rooms/RoomStory"), {
+  ssr: false,
+});
+const RoomWorks = dynamic(() => import("@/components/rooms/RoomWorks"), {
+  ssr: false,
+});
+const RoomArsenal = dynamic(() => import("@/components/rooms/RoomArsenal"), {
+  ssr: false,
+});
+const RoomDialogue = dynamic(() => import("@/components/rooms/RoomDialogue"), {
+  ssr: false,
+});
 
 /** Blank #080808 frame shown for the single tick before device detection. */
 function LoadingGate() {
