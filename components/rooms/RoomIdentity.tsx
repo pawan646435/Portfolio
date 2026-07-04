@@ -110,11 +110,11 @@ export default function RoomIdentity() {
 
       {/* Golden spiral — full-room background, like an illuminated manuscript's decorative geometry */}
       <div
-        className="hidden md:block absolute inset-0 z-1 pointer-events-none"
-        style={{ opacity: 0.7 }}
+        className="hidden md:block absolute inset-0 z-0 pointer-events-none select-none"
+        style={{ opacity: 0.3, mixBlendMode: "screen" }}
         data-reveal
-        data-reveal-base="0.55"
-        data-reveal-max="0.85"
+        data-reveal-base="0.3"
+        data-reveal-max="0.35"
         data-reveal-radius="500"
       >
         <GoldenSpiral className="w-full h-full" />

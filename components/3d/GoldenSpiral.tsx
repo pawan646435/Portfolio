@@ -61,7 +61,7 @@ function FibonacciDots({ totalTurns, radiusScale }: { totalTurns: number; radius
     const t = clock.getElapsedTime();
     materials.current.forEach((mat, i) => {
       if (!mat) return;
-      mat.emissiveIntensity = reducedMotion ? 0.4 : 0.2 + Math.sin(t * 1.2 + i * 0.8) * 0.2;
+      mat.emissiveIntensity = reducedMotion ? 0.15 : 0.15 + Math.sin(t * 1.2 + i * 0.8) * 0.1;
     });
   });
 
@@ -76,7 +76,9 @@ function FibonacciDots({ totalTurns, radiusScale }: { totalTurns: number; radius
             }}
             color="#FFD700"
             emissive="#FFD700"
-            emissiveIntensity={0.3}
+            emissiveIntensity={0.15}
+            transparent
+            opacity={0.5}
           />
         </mesh>
       ))}
@@ -85,9 +87,9 @@ function FibonacciDots({ totalTurns, radiusScale }: { totalTurns: number; radius
 }
 
 const GOLDEN_RECTANGLES = [
-  { w: 1.0, h: 0.618, z: -0.5, opacity: 0.06 },
-  { w: 1.618, h: 1.0, z: -0.8, opacity: 0.03 },
-  { w: 2.618, h: 1.618, z: -1.2, opacity: 0.015 },
+  { w: 1.0, h: 0.618, z: -0.5, opacity: 0.04 },
+  { w: 1.618, h: 1.0, z: -0.8, opacity: 0.02 },
+  { w: 2.618, h: 1.618, z: -1.2, opacity: 0.01 },
 ];
 
 function GoldenRectangles() {
@@ -127,7 +129,7 @@ function MeasurementArc() {
   return (
     <mesh ref={meshRef}>
       <torusGeometry args={[2.2, 0.004, 8, 64, Math.PI * 0.75]} />
-      <meshBasicMaterial color="#C9A84C" transparent opacity={0.1} />
+      <meshBasicMaterial color="#C9A84C" transparent opacity={0.04} />
     </mesh>
   );
 }
@@ -182,9 +184,9 @@ function SpiralGroup({ interactive }: { interactive: boolean }) {
     <>
       <group ref={groupRef}>
         <group scale={1.02}>
-          <Line points={points} color="#C9A84C" transparent opacity={0.05} lineWidth={1.5} />
+          <Line points={points} color="#C9A84C" transparent opacity={0.02} lineWidth={1.5} />
         </group>
-        <Line points={points} vertexColors={colors} transparent opacity={0.45} lineWidth={1.5} />
+        <Line points={points} vertexColors={colors} transparent opacity={0.18} lineWidth={1.5} />
         <FibonacciDots totalTurns={totalTurns} radiusScale={0.15} />
       </group>
       <GoldenRectangles />
@@ -209,7 +211,7 @@ export default function GoldenSpiral({
       <span
         aria-hidden="true"
         className="font-classical absolute pointer-events-none select-none"
-        style={{ top: "4%", right: "6%", fontSize: "3rem", color: "rgba(201,168,76,0.12)" }}
+        style={{ top: "4%", right: "6%", fontSize: "3rem", color: "rgba(201,168,76,0.06)" }}
       >
         φ
       </span>
@@ -219,11 +221,16 @@ export default function GoldenSpiral({
         performance={{ min: 0.5 }}
         frameloop="always"
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-        style={{ background: "transparent", width: "100%", height: "100%" }}
+        style={{
+          background: "transparent",
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+        }}
       >
-        <pointLight color="#FFD700" intensity={1.2} position={[2, 3, 3]} />
+        <pointLight color="#FFD700" intensity={0.3} position={[2, 3, 3]} />
         <pointLight color="#C9A84C" intensity={0.4} position={[-3, -2, 2]} />
-        <ambientLight color="#3D2B00" intensity={0.3} />
+        <ambientLight color="#3D2B00" intensity={0.06} />
         <SpiralGroup interactive={interactive} />
       </Canvas>
     </div>

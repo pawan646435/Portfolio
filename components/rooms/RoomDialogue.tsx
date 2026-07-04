@@ -35,22 +35,25 @@ export default function RoomDialogue() {
       <span className="room-label">Codex V — Dialogue</span>
 
       {/* Full-room spiral — the codex closes where it began, a ghost of Room I */}
-      <div className="absolute inset-0 pointer-events-none z-0">
+      <div
+        className="absolute inset-0 pointer-events-none select-none z-0"
+        style={{ mixBlendMode: "screen" }}
+      >
         <GoldenSpiralMini
           key="background-spiral"
           className="w-full h-full"
-          scale={2.2}
+          scale={1.8}
           position={[0.8, -0.3, 0]}
           rotationSpeed={{ x: 0.0002, y: 0, z: 0.0008 }}
           breatheAmplitude={0.03}
-          opacity={0.3}
+          opacity={0.12}
           interactive
-          activeOpacity={0.55}
+          activeOpacity={0.25}
           cameraPosition={[0, 0, 6]}
           fov={50}
           dpr={[1, 1.5]}
-          pointLightIntensity={0.5}
-          ambientLightIntensity={0.1}
+          pointLightIntensity={0.2}
+          ambientLightIntensity={0.05}
           ambientColor="#C9A84C"
           frameloop={isActive ? "always" : "demand"}
         />

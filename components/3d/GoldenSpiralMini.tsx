@@ -119,7 +119,12 @@ export default function GoldenSpiralMini({
         performance={{ min: 0.5 }}
         frameloop={frameloop}
         gl={gl}
-        style={{ background: "transparent", width: "100%", height: "100%" }}
+        style={{
+          background: "transparent",
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+        }}
       >
         <pointLight color="#FFD700" intensity={pointLightIntensity} position={[2, 2, 2]} />
         <ambientLight color={ambientColor} intensity={ambientLightIntensity} />
