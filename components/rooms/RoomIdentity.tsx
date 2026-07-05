@@ -10,9 +10,6 @@ import { spotlight } from "@/lib/spotlight";
 import { useMediaQuery, useReducedMotion } from "@/lib/hooks";
 import Typewriter from "@/components/ui/Typewriter";
 
-const GoldenSpiral = dynamic(() => import("@/components/3d/GoldenSpiral"), {
-  ssr: false,
-});
 const ParticlesBackground = dynamic(
   () => import("@/components/ui/ParticlesBackground"),
   { ssr: false }
@@ -108,17 +105,9 @@ export default function RoomIdentity() {
     <div className="relative w-full h-full">
       <ParticlesBackground />
 
-      {/* Golden spiral — full-room background, like an illuminated manuscript's decorative geometry */}
-      <div
-        className="hidden md:block absolute inset-0 z-0 pointer-events-none select-none"
-        style={{ opacity: 0.3, mixBlendMode: "screen" }}
-        data-reveal
-        data-reveal-base="0.3"
-        data-reveal-max="0.35"
-        data-reveal-radius="500"
-      >
-        <GoldenSpiral className="w-full h-full" />
-      </div>
+      {/* Gold ink wash — a single breathing candle behind the inscription */}
+      <div className="gold-ink-wash z-1" />
+      <div className="gold-vignette z-2" />
 
       {/* Light pooling at the gallery floor */}
       <div

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { FiGithub, FiLinkedin, FiMail } from "react-icons/fi";
 import { profile } from "@/lib/data";
@@ -9,10 +8,6 @@ import { useApp } from "@/lib/context/AppContext";
 import { useReducedMotion } from "@/lib/hooks";
 import Typewriter from "@/components/ui/Typewriter";
 import { MOBILE_NAV_EVENT } from "@/components/mobile/MobileLayout";
-
-const MobileSpiral = dynamic(() => import("@/components/mobile/MobileSpiral"), {
-  ssr: false,
-});
 
 const SOCIALS = [
   { href: profile.github, icon: <FiGithub />, label: "GitHub profile" },
@@ -39,16 +34,9 @@ export default function MobileRoomIdentity() {
 
   return (
     <div className="relative h-full">
-      {/* Golden spiral — full background */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        style={{ opacity: 0.5 }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.5 }}
-        transition={{ duration: 1.5, delay: 0.8 }}
-      >
-        <MobileSpiral fill />
-      </motion.div>
+      {/* Gold ink wash — a single breathing candle behind the inscription */}
+      <div className="gold-ink-wash z-1" />
+      <div className="gold-vignette z-2" />
 
       <div
         className="relative z-10 flex flex-col items-center justify-center text-center h-full"

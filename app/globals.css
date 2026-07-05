@@ -130,53 +130,197 @@ body {
     0 0 0 1px rgba(201, 168, 76, 0.3);
 }
 
-/* Ambient candlelight blobs (hero) */
-@keyframes candlelight {
+/* Gold ink wash — a single breathing radial glow behind Room I & V content */
+@keyframes inkBreathe {
   0% {
-    transform: scale(1) translate(0, 0);
-    opacity: 0.8;
+    transform: scale(1);
+    opacity: 0.85;
   }
-  33% {
-    transform: scale(1.08) translate(10px, -15px);
+  50% {
+    transform: scale(1.06);
     opacity: 1;
   }
-  66% {
-    transform: scale(0.95) translate(-8px, 10px);
-    opacity: 0.7;
-  }
   100% {
-    transform: scale(1.05) translate(5px, -8px);
-    opacity: 0.9;
+    transform: scale(1);
+    opacity: 0.85;
   }
 }
 
-.candlelight-blob {
+.gold-ink-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  background: radial-gradient(
+    ellipse 65% 55% at 50% 48%,
+    rgba(201, 168, 76, 0.09) 0%,
+    rgba(201, 168, 76, 0.05) 25%,
+    rgba(201, 168, 76, 0.02) 50%,
+    transparent 72%
+  );
+  animation: inkBreathe 8s ease-in-out infinite;
+}
+
+.gold-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    transparent 40%,
+    rgba(8, 8, 8, 0.4) 70%,
+    rgba(8, 8, 8, 0.85) 100%
+  );
+}
+
+.gold-ink-wash-dialogue {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  background: radial-gradient(
+    ellipse 55% 60% at 50% 45%,
+    rgba(201, 168, 76, 0.07) 0%,
+    rgba(201, 168, 76, 0.03) 30%,
+    rgba(201, 168, 76, 0.01) 55%,
+    transparent 75%
+  );
+  animation: inkBreathe 11s ease-in-out infinite;
+}
+
+.gold-vignette-dialogue {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    transparent 35%,
+    rgba(8, 8, 8, 0.5) 65%,
+    rgba(8, 8, 8, 0.92) 100%
+  );
+}
+
+@media (max-width: 768px) {
+  .gold-ink-wash {
+    background: radial-gradient(
+      ellipse 85% 50% at 50% 45%,
+      rgba(201, 168, 76, 0.08) 0%,
+      rgba(201, 168, 76, 0.04) 30%,
+      rgba(201, 168, 76, 0.01) 55%,
+      transparent 75%
+    );
+    animation-duration: 10s;
+  }
+
+  .gold-vignette {
+    background: radial-gradient(
+      ellipse 100% 100% at 50% 50%,
+      transparent 30%,
+      rgba(8, 8, 8, 0.5) 60%,
+      rgba(8, 8, 8, 0.88) 100%
+    );
+  }
+
+  .gold-ink-wash-dialogue {
+    background: radial-gradient(
+      ellipse 80% 55% at 50% 42%,
+      rgba(201, 168, 76, 0.06) 0%,
+      rgba(201, 168, 76, 0.02) 35%,
+      transparent 65%
+    );
+    animation-duration: 14s;
+  }
+}
+
+/* Dialogue seal — two rings rotating opposite directions, pure CSS */
+@keyframes sealRotate1 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sealRotate2 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sealPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
+}
+
+.dialogue-seal {
+  width: 64px;
+  height: 64px;
+  position: relative;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialogue-seal .seal-ring {
   position: absolute;
   border-radius: 50%;
-  pointer-events: none;
+  border: 1px solid rgba(201, 168, 76, 0.3);
 }
 
-.candlelight-blob-main {
-  width: 600px;
-  height: 600px;
-  top: -100px;
-  left: 10%;
-  background: radial-gradient(
-    circle,
-    rgba(201, 168, 76, 0.06) 0%,
-    rgba(201, 168, 76, 0.02) 40%,
-    transparent 70%
-  );
-  animation: candlelight 6s ease-in-out infinite alternate;
+.dialogue-seal .seal-ring-1 {
+  width: 64px;
+  height: 64px;
+  animation: sealRotate1 20s linear infinite;
 }
 
-.candlelight-blob-fill {
-  width: 400px;
-  height: 400px;
-  bottom: 0;
-  right: 15%;
-  background: radial-gradient(circle, rgba(240, 192, 96, 0.04) 0%, transparent 65%);
-  animation: candlelight 8s ease-in-out infinite alternate-reverse;
+.dialogue-seal .seal-ring-2 {
+  width: 42px;
+  height: 42px;
+  border-color: rgba(201, 168, 76, 0.2);
+  animation: sealRotate2 14s linear infinite reverse;
+}
+
+.dialogue-seal .seal-center {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(201, 168, 76, 0.5);
+  animation: sealPulse 3s ease-in-out infinite;
+}
+
+@media (max-width: 375px) {
+  .dialogue-seal {
+    width: 52px;
+    height: 52px;
+  }
+
+  .dialogue-seal .seal-ring-1 {
+    width: 52px;
+    height: 52px;
+  }
+
+  .dialogue-seal .seal-ring-2 {
+    width: 34px;
+    height: 34px;
+  }
 }
 
 /* Manuscript footer */
@@ -470,20 +614,81 @@ body {
 
 /* ——— The Codex: entry gate ——— */
 
-.entry-button {
-  background: none;
-  border: none;
-  font-size: 1.3rem;
-  color: var(--text-primary);
-  letter-spacing: 0.05em;
-  padding: 4px 8px 8px;
-  border-bottom: 2px solid var(--accent-gold);
-  transition: color 0.4s ease, letter-spacing 0.4s ease;
+.gate-ink-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 50%,
+    rgba(201, 168, 76, 0.06) 0%,
+    rgba(201, 168, 76, 0.02) 40%,
+    transparent 70%
+  );
+  animation: inkBreathe 8s ease-in-out infinite;
 }
 
-.entry-button:hover {
+@keyframes dotPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+.gate-monogram-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent-gold-pure);
+  margin: 10px auto 0;
+  animation: dotPulse 3s ease-in-out infinite;
+}
+
+.gate-enter-btn {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  transition: color 0.4s ease;
+}
+
+.gate-enter-btn:hover {
   color: var(--accent-gold);
-  letter-spacing: 0.08em;
+}
+
+.gate-enter-line {
+  width: 40px;
+  height: 1px;
+  background: var(--accent-gold);
+  opacity: 0.4;
+  margin: 8px auto 0;
+  transition: width 0.4s ease, opacity 0.4s ease;
+}
+
+.gate-enter-btn:hover .gate-enter-line {
+  width: 80px;
+  opacity: 1;
+}
+
+.gate-bottom-hairline {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(201, 168, 76, 0.15) 30%,
+    rgba(201, 168, 76, 0.15) 70%,
+    transparent
+  );
 }
 
 /* ——— The Codex: codex-style CTA links ——— */
@@ -735,29 +940,6 @@ body {
     opacity: 0.018;
   }
 
-  @keyframes sealRotate {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  .codex-seal {
-    animation: sealRotate 24s linear infinite;
-    transform-origin: center center;
-  }
-
-  /* Static candlelight — no animation on mobile for battery */
-  .mobile-candle-blob {
-    position: absolute;
-    pointer-events: none;
-    border-radius: 50%;
-    width: 320px;
-    height: 320px;
-    background: radial-gradient(circle, rgba(201, 168, 76, 0.04) 0%, transparent 65%);
-  }
 
   /* Scroll system */
   .mobile-scroll-container {
@@ -1091,7 +1273,6 @@ body {
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .codex-seal,
     .mobile-scroll-hint {
       animation-play-state: paused;
     }
