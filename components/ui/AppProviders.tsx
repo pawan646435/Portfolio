@@ -11,6 +11,9 @@ import { AppProvider } from "@/lib/context/AppContext";
 const CustomCursor = dynamic(() => import("@/components/ui/CustomCursor"), {
   ssr: false,
 });
+const ChatWidget = dynamic(() => import("@/components/ui/ChatWidget"), {
+  ssr: false,
+});
 
 async function init(engine: Engine) {
   await loadSlim(engine);
@@ -23,6 +26,7 @@ export default function AppProviders({ children }: { children: ReactNode }) {
         <AppProvider>
           <CustomCursor />
           {children}
+          <ChatWidget />
         </AppProvider>
       </Provider>
     </MotionConfig>

@@ -75,6 +75,20 @@ public/audio/ambient.mp3
 Recommended sources: Musopen.org, Free Music Archive, or public-domain
 recordings such as Erik Satie's Gymnopédies.
 
+## AI Chatbot
+
+A floating chat widget (bottom-right, launcher = Pawan's portrait) lets
+visitors ask about his background, skills, and projects. Answers are
+grounded in `lib/portfolio-knowledge.ts` and streamed from Groq via the
+Vercel AI SDK.
+
+- `app/api/chat/route.ts` — streaming API route (`ai` + `@ai-sdk/groq`)
+- `lib/portfolio-knowledge.ts` — the knowledge base / system prompt
+- `components/ui/ChatWidget.tsx` — the widget, mounted in `AppProviders.tsx`
+
+Requires a `GROQ_API_KEY` in `.env.local` (and in Vercel project
+settings for deployment).
+
 ## Deployment
 
 Deployed on Vercel: [portfolio-indol-chi-66.vercel.app](https://portfolio-indol-chi-66.vercel.app)
