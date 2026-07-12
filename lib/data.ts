@@ -57,16 +57,16 @@ export const projects: Project[] = [
   {
     id: "skillpilot",
     name: "SkillPilot",
-    tagline: "AI-powered interview prep & code battles",
+    tagline: "AI interview panels & code battles",
     status: "● Live",
     live: true,
     bannerGradient: "linear-gradient(180deg, #0D0B00, transparent)",
     longDescription:
-      "An AI-powered interview preparation and competitive coding platform. Real-time 1v1 code battles run over Firebase with live synchronisation; AI voice interviews are conducted via Groq; a Monaco Editor powers the coding surface and a full recruiter dashboard closes the loop between candidates and hiring teams.",
+      "A full-stack AI engineering platform: React/Vite frontend, FastAPI backend on Cloud Run, Firebase. Its AI Interview Panel layers RAG retrieval, multi-agent interviewer personas, SSE streaming, and a golden-set eval harness — alongside sandboxed multi-language Code Clash battles and recruiter assessments.",
     gradient: "linear-gradient(135deg, #0D0D0D, #2A1F00)",
     description:
-      "AI-powered interview prep & competitive coding platform. Real-time 1v1 code battles, AI voice interviews via Groq, Monaco Editor & a full recruiter dashboard.",
-    stack: ["React", "Vite", "Firebase", "Groq", "Monaco Editor", "Framer Motion"],
+      "Full-stack AI engineering platform: RAG-driven interview panels with multi-agent orchestration & real-time streaming, live 1v1 code battles across 4 languages, and recruiter-grade assessments.",
+    stack: ["React", "Vite", "FastAPI", "Firebase", "Google Cloud Run", "RAG", "Monaco Editor"],
     github: "https://github.com/pawan646435/SkillPilot",
     demo: "https://skill-pilot-coral.vercel.app",
   },

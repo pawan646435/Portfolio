@@ -6,7 +6,7 @@ import AnatomicalSketch from "@/components/ui/AnatomicalSketch";
 
 const PARAGRAPHS = [
   "A self-taught builder who ships real products while still a student. No bootcamp certificates on the wall — just deployed URLs, commit histories, and users.",
-  "Full-stack first, AI always: AlphaMatrix ranks Indian equities with deterministic scoring engines, SkillPilot runs live 1v1 code battles with AI voice interviews, and FlowDesk AI answers support tickets grounded in a pgvector RAG pipeline.",
+  "Full-stack first, AI always: AlphaMatrix ranks Indian equities with deterministic scoring engines, SkillPilot runs live 1v1 code battles and a RAG-driven, multi-agent AI interview panel, and FlowDesk AI answers support tickets grounded in a pgvector RAG pipeline.",
   "Currently going deep on LangChain, LangGraph and FastAPI — teaching the web to think, one agent at a time.",
 ];
 

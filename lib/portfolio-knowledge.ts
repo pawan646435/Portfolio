@@ -39,13 +39,19 @@ panel for an independent technical model, and an Interactive Analyst
 Terminal chatbot built on a tool-calling agent architecture.
 
 ## SkillPilot
-An AI interview preparation and coding assessment platform. FastAPI
-backend on Google Cloud Run, React 19 + Vite frontend on Vercel, Firebase
-Auth + Firestore, pgvector for retrieval. Includes a multi-stage AI
-Interview Panel feature with a RAG ingestion pipeline (all-MiniLM-L6-v2
-embeddings) and multi-agent orchestration — a Technical Interviewer,
-Hiring Manager, and Panel Lead persona — with real-time streaming
-responses.
+A full-stack AI engineering platform: React + Vite frontend on Vercel,
+FastAPI backend on Google Cloud Run, Firebase for auth, Firestore, and
+storage. Includes Code Clash (sandboxed real-time 1v1 coding battles
+judged across Node, Python, Java, and C++), an India-focused Career Hub
+(job search + tech news), and recruiter-facing Assessments with real
+judged submissions. Its standout feature is a 4-stage AI Interview Panel:
+RAG ingestion of resumes/JDs via sentence-transformers with
+cosine-similarity retrieval, multi-agent Technical Interviewer + Hiring
+Manager personas with a relevance-threshold fallback, SSE token
+streaming, and a golden-set eval harness for regression-testing prompt
+changes. Supports resume upload (PDF/DOCX) or pasted text, and a
+Fresher/Experienced selector that adapts both retrieval and question
+phrasing.
 
 ## FlowDesk AI
 An enterprise RAG-powered support desk built with Next.js 15, TypeScript,
