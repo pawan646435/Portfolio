@@ -54,8 +54,20 @@ Fresher/Experienced selector that adapts both retrieval and question
 phrasing.
 
 ## FlowDesk AI
-An enterprise RAG-powered support desk built with Next.js 15, TypeScript,
-Prisma, Neon DB, and Google Gemini.
+A production-grade, multi-tenant SaaS support platform built with Next.js 15,
+TypeScript, PostgreSQL (Neon + pgvector), Prisma, Auth.js, Google Gemini, the
+WhatsApp Business Cloud API, and n8n, deployed on Vercel. Companies manage
+customer tickets through a web dashboard while their customers interact
+entirely over WhatsApp with no account required. A RAG-grounded AI agent
+answers customer questions from each company's own knowledge base and
+auto-classifies every ticket's category, priority, and sentiment. Other
+highlights: an SLA tracking system with atomic, concurrency-safe breach
+detection; full multi-tenant data isolation with role-based access and two
+org-joining flows; session-staleness handling for immediate access
+revocation; a decoupled n8n notification architecture that never blocks the
+core customer-facing flow; and a measured performance optimization pass
+(reduced bundle size, fixed N+1 queries, batched embeddings, ~2x faster
+dashboard load).
 
 ## Silsila
 A demo website built for a coffee house and curated living concept store
