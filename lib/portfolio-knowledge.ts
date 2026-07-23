@@ -69,6 +69,56 @@ core customer-facing flow; and a measured performance optimization pass
 (reduced bundle size, fixed N+1 queries, batched embeddings, ~2x faster
 dashboard load).
 
+## Veritas
+An LLM-as-judge auditing system that detects hallucination, tool misuse,
+and task failure in other AI agents, making "does my agent hallucinate?" a
+measurable number instead of a guess. Live API docs at
+https://veritas-o3co.onrender.com/docs (it's an API-first project, so the
+Swagger docs are the live demo), source at
+https://github.com/pawan646435/Veritas. It runs a target finance Q&A agent
+(real Groq tool-calling), auto-generates adversarial test cases via a
+high-temperature LLM test generator, executes them through a
+dependency-injected test runner (typing.Protocol-based, so any agent can be
+swapped in), and scores each run with a three-judge LLM-as-judge panel
+evaluating groundedness, tool use correctness, and task completion. A
+pandas-based reporter computes hallucination rate and category breakdowns,
+and a formal meta-evaluation layer measures judge-vs-human agreement using
+Cohen's kappa to validate that the judges themselves are trustworthy. Built
+with Python, FastAPI, Groq (Llama 3.3 70B), Postgres (Neon) with SQLAlchemy
+2.0 async ORM and Alembic migrations, a multi-stage Docker build, and
+GitHub Actions CI, deployed on Render. Also includes a cross-system audit
+adapter that let Veritas audit a second, unrelated production agent
+(AlphaMatrix's assistant) through the same Protocol interface, proving the
+auditor generalizes beyond its own target agent. This is Pawan's primary
+AI-engineering portfolio piece, demonstrating eval design, LLM-as-judge
+methodology, and agent reliability testing rather than just "using an LLM
+API."
+
+## Pramana
+An AI narration system for Vedic astrology where every generated claim is
+checked against deterministic astronomical computation, making
+hallucination rate a precisely measured, verifiable metric. Live at
+https://pramana-astro.vercel.app, source at
+https://github.com/pawan646435/pramana. Pramana (Sanskrit for "a valid
+means of knowledge/proof") pairs deterministic ephemeris computation with
+LLM narration: real astronomical data — planetary positions, dashas,
+panchang — is computed via pyswisseph to form ground-truth chart data, an
+LLM narrates that data into readable astrology content, and a verification
+pipeline extracts every factual claim from the narration and checks it
+against the computed source data before it's shown to the user. On a
+golden-set eval across 5 test charts, ungrounded generation had a 39.6%
+hallucination rate; the grounded, verified pipeline had 0.0% — a 100%
+relative reduction, measured empirically rather than claimed. Built as a
+single FastAPI service internally modularized into compute / generation /
+verification layers, using Groq and Gemini for generation, Redis (Upstash)
+for caching charts and history, Postgres (Neon) for eval runs and
+generation persistence, and a Next.js + TypeScript + Tailwind frontend with
+a Three.js 3D solar system landing page and a dashboard with generation
+history and an expandable "try it yourself" panel. Demonstrates
+hallucination measurement and grounding architecture applied to a
+genuinely differentiated, personally meaningful domain rather than a
+generic RAG demo.
+
 ## Silsila
 A demo website built for a coffee house and curated living concept store
 in Haldwani, India — public menu, table booking with email confirmation,

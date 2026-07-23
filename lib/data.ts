@@ -96,6 +96,59 @@ export const projects: Project[] = [
     github: "https://github.com/pawan646435/FlowDesk-AI",
     demo: "https://flow-desk-ai-rose.vercel.app",
   },
+  {
+    id: "veritas",
+    name: "Veritas",
+    tagline: "Autonomous AI agent auditor",
+    status: "● Live",
+    live: true,
+    bannerGradient: "linear-gradient(180deg, #150F00, transparent)",
+    longDescription:
+      "Veritas is a full auditing pipeline built to make \"does my agent hallucinate?\" a measurable number instead of a guess. It runs a target finance Q&A agent (real Groq tool-calling), auto-generates adversarial test cases via a high-temperature LLM test generator, executes them through a dependency-injected test runner (typing.Protocol-based, so any agent can be swapped in), and scores each run with a three-judge LLM-as-judge panel evaluating groundedness, tool use correctness, and task completion. A pandas-based reporter computes hallucination rate and category breakdowns, and a formal meta-evaluation layer measures judge-vs-human agreement using Cohen's kappa — validating that the judges themselves are trustworthy. Notable engineering: Postgres persistence (Neon + SQLAlchemy 2.0 async ORM + Alembic), a FastAPI wrapper, multi-stage Docker build, GitHub Actions CI, deployed on Render. Also includes a cross-system audit adapter that let Veritas audit a second, unrelated production agent (AlphaMatrix's assistant) through the same Protocol interface — proving the auditor generalizes beyond its own target agent.",
+    gradient: "linear-gradient(135deg, #150F00, #3D2B00)",
+    description:
+      "LLM-as-judge auditing system that detects hallucination, tool misuse, and task failure in other AI agents — a three-judge panel, Cohen's kappa meta-evaluation, and a Protocol-based interface that generalizes to auditing other agents.",
+    stack: [
+      "Python",
+      "FastAPI",
+      "Groq (Llama 3.3 70B)",
+      "PostgreSQL (Neon)",
+      "SQLAlchemy 2.0",
+      "Alembic",
+      "Docker",
+      "GitHub Actions",
+      "Render",
+    ],
+    github: "https://github.com/pawan646435/Veritas",
+    demo: "https://veritas-o3co.onrender.com/docs",
+  },
+  {
+    id: "pramana",
+    name: "Pramana",
+    tagline: "Hallucination-grounded Vedic astrology generator",
+    status: "● Live",
+    live: true,
+    bannerGradient: "linear-gradient(180deg, #12080A, transparent)",
+    longDescription:
+      "Pramana (Sanskrit for \"a valid means of knowledge/proof\") pairs deterministic ephemeris computation with LLM narration. Real astronomical data — planetary positions, dashas, panchang — is computed via pyswisseph, forming ground-truth chart data. An LLM then narrates this data into readable astrology content, and a verification pipeline extracts every factual claim from the narration and checks it against the computed source data before it's shown to the user. On a golden-set eval across 5 test charts, ungrounded generation had a 39.6% hallucination rate; the grounded, verified pipeline had 0.0% — a 100% relative reduction, measured empirically rather than claimed. Notable engineering: a single FastAPI service internally modularized into compute / generation / verification layers, Groq + Gemini for generation, Redis (Upstash) caching for charts and history, Postgres (Neon) for eval runs and generation persistence, a Next.js frontend with a Three.js 3D solar system landing page and a dashboard with generation history and an expandable \"try it yourself\" panel.",
+    gradient: "linear-gradient(135deg, #12080A, #3D0B1F22)",
+    description:
+      "AI narration system where every generated claim is checked against deterministic astronomical computation — an empirically measured 39.6% → 0.0% hallucination rate reduction, applied to Vedic astrology.",
+    stack: [
+      "FastAPI",
+      "Next.js",
+      "TypeScript",
+      "Tailwind",
+      "Groq (Llama 3.3 70B)",
+      "Gemini",
+      "pyswisseph",
+      "PostgreSQL (Neon)",
+      "Redis (Upstash)",
+      "Three.js",
+    ],
+    github: "https://github.com/pawan646435/pramana",
+    demo: "https://pramana-astro.vercel.app",
+  },
 ];
 
 export type SkillTag = "Core" | "Daily" | "Learning" | "AI";
